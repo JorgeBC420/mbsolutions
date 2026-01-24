@@ -248,8 +248,8 @@ html {
 .carousel-container {
     position: relative;
     width: 100%;
-    max-width: 500px;
-    height: 400px;
+    max-width: 600px;
+    aspect-ratio: 2 / 1; /* ideal para 1600x789 */
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
@@ -276,7 +276,8 @@ html {
 .carousel-slide img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+object-fit: contain;
+background: #000;
 }
 
 .carousel-prev,
@@ -352,6 +353,18 @@ html {
 @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-20px); }
+}
+
+@media (max-width: 768px) {
+    .hero-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .carousel-container {
+        max-width: 100%;
+        aspect-ratio: 16 / 9;
+    }
 }
 
 /* ========================================
