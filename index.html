@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MB Solutions CR | Tienda de Computadoras y Soporte Técnico</title>
+    <meta name="description" content="Venta de equipos tecnológicos y soporte técnico en Costa Rica. Computadoras, laptops, accesorios y reparación profesional.">
+    <meta name="keywords" content="computadoras costa rica, soporte técnico, reparación pc, venta laptops, MB Solutions">
+    <meta property="og:title" content="MB Solutions CR - Tecnología que conecta contigo">
+    <meta property="og:description" content="Tienda de computadoras y soporte técnico profesional">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mbsolutionscr.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <img src="images/mbslogo.webp" alt="MB Solutions Logo" class="logo-img">
+                <div class="logo-text">MB Solutions</div>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#inicio">Inicio</a></li>
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#tienda">Tienda</a></li>
+                <li><a href="#nosotros">Nosotros</a></li>
+                <li><a href="#contacto" class="nav-cta">Contacto</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero" id="inicio">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>¡BIENVENIDOS A MB SOLUTIONS CR!</h1>
+                <p class="hero-tagline">Tecnología que conecta contigo.</p>
+                <div class="hero-buttons">
+                    <a href="#servicios" class="btn btn-primary">
+                        <i class="fas fa-laptop"></i> Ver Tienda
+                    </a>
+                    <a href="tel:+50662055092" class="btn btn-outline">
+                        <i class="fas fa-phone"></i> Llamar Ahora
+                    </a>
+                </div>
+                <div class="hero-phone">
+                    <i class="fas fa-phone-alt"></i>
+                    <div>
+                        <strong>Llámanos:</strong><br>
+                        <a href="tel:+50662055092" style="color: white; text-decoration: none;">+506 6205 5092</a>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <div class="carousel-container">
+                    <div class="carousel-wrapper">
+                        <div class="carousel-slide active">
+                            <img src="images/carrusel/carrusel1.webp" alt="Productos MB Solutions">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="images/carrusel/carrusel2.webp" alt="Productos MB Solutions">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="images/carrusel/carrusel3.webp" alt="Productos MB Solutions">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="images/carrusel/carrusel4.webp" alt="Productos MB Solutions">
+                        </div>
+                    </div>
+                    <button class="carousel-prev" onclick="previousSlide()">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-next" onclick="nextSlide()">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="carousel-dots">
+                        <div class="carousel-dot active" onclick="currentSlide(0)"></div>
+                        <div class="carousel-dot" onclick="currentSlide(1)"></div>
+                        <div class="carousel-dot" onclick="currentSlide(2)"></div>
+                        <div class="carousel-dot" onclick="currentSlide(3)"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section class="section" id="servicios">
+        <div class="section-header">
+            <h2>Nuestros Servicios</h2>
+            <p>Soluciones completas en tecnología para tu hogar o negocio</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-laptop-code"></i>
+                </div>
+                <h3>Tienda</h3>
+                <p>Amplia variedad de equipos tecnológicos de alta calidad, con precios justos y entrega rápida. Garantía y compromiso con tu satisfacción.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Soporte</h3>
+                <p>Acompañamiento técnico cercano y confiable. Soluciones rápidas y personalizadas para mantener tus equipos funcionando óptimamente.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Proyectos Tecnológicos</h3>
+                <p>Diseñamos e implementamos soluciones a medida. Desde planificación hasta ejecución, acompañándote en cada etapa del proyecto.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- TIENDA VIRTUAL -->
+    <section class="section" id="tienda" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);">
+        <div class="section-header">
+            <h2>Tienda Virtual</h2>
+            <p>Compra nuestros productos en línea</p>
+        </div>
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; align-items: center; min-height: 400px;">
+            <div style="text-align: center; padding: 4rem 2rem; background: white; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.08); max-width: 600px;">
+                <div style="font-size: 5rem; color: var(--primary); margin-bottom: 1.5rem;">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <h3 style="font-size: 2rem; color: var(--dark); margin-bottom: 1rem;">En Construcción</h3>
+                <p style="font-size: 1.1rem; color: var(--gray); margin-bottom: 2rem; line-height: 1.8;">
+                    Estamos preparando nuestra tienda virtual para ofrecerte la mejor experiencia de compra. 
+                    Pronto podrás comprar tus productos favoritos directamente desde aquí.
+                </p>
+                <p style="font-size: 1rem; color: var(--gray); margin-bottom: 2rem;">
+                    Mientras tanto, contáctanos para hacer tu pedido:
+                </p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <a href="https://wa.me/50662055092?text=Hola,%20me%20interesa%20hacer%20un%20pedido" class="btn btn-primary" style="background: var(--primary); color: white;">
+                        <i class="fab fa-whatsapp"></i> Contactar por WhatsApp
+                    </a>
+                    <a href="tel:+50662055092" class="btn" style="background: white; color: var(--primary); border: 2px solid var(--primary);">
+                        <i class="fas fa-phone"></i> Llamar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" id="nosotros">
+        <div class="section-header">
+            <h2>¿Por qué elegirnos?</h2>
+            <p>Compromiso, experiencia y tecnología de vanguardia</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <h4>Garantía Total</h4>
+                <p>Todos nuestros productos respaldados con garantía</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h4>Entrega Rápida</h4>
+                <p>Envíos a todo Costa Rica con seguimiento</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+                <h4>Asesoría Experta</h4>
+                <p>Equipo capacitado para ayudarte a elegir</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <h4>Precios Justos</h4>
+                <p>Mejores precios del mercado costarricense</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="contact-section" id="contacto">
+        <div class="section-header">
+            <h2>Contáctanos</h2>
+            <p>Estamos aquí para ayudarte con tus necesidades tecnológicas</p>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-info-box">
+                <h3>Información de Contacto</h3>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div>
+                        <h4>Ubicación</h4>
+                        <p>Costa Rica, CR</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <h4>Teléfono</h4>
+                        <p><a href="tel:+50662055092">+506 6205 5092</a></p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <h4>Email</h4>
+                        <p><a href="mailto:ventas@mbsolutionscr.com">ventas@mbsolutionscr.com</a></p>
+                    </div>
+                </div>
+                <div class="social-links">
+                    <a href="https://facebook.com/mbsolutionscr" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://instagram.com/mbsolutionscr" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://wa.me/50662055092" target="_blank" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                </div>
+            </div>
+
+            <form class="contact-form" onsubmit="return handleSubmit(event)">
+                <div class="form-group">
+                    <label for="company">Empresa</label>
+                    <input type="text" id="company" name="company" placeholder="Nombre de tu empresa">
+                </div>
+                <div class="form-group">
+                    <label for="name">Nombre Completo *</label>
+                    <input type="text" id="name" name="name" required placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Teléfono *</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="+506 1234 5678">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="tucorreo@ejemplo.com">
+                </div>
+                <div class="form-group">
+                    <label for="message">Mensaje *</label>
+                    <textarea id="message" name="message" required placeholder="¿En qué podemos ayudarte?"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fab fa-whatsapp"></i> Enviar Consulta por WhatsApp
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>MB Solutions CR</h3>
+                <p>Tecnología que conecta contigo. Venta de equipos tecnológicos y soporte técnico profesional en Costa Rica.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Navegación</h3>
+                <a href="#inicio">Inicio</a>
+                <a href="#servicios">Servicios</a>
+                <a href="#nosotros">Nosotros</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contacto</h3>
+                <p>Costa Rica</p>
+                <p>Tel: +506 6205 5092</p>
+                <p>Email: ventas@mbsolutionscr.com</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 MB Solutions CR. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- WHATSAPP FLOAT -->
+    <a href="https://wa.me/50662055092?text=Hola,%20me%20interesa%20información%20sobre%20sus%20productos" class="whatsapp-float" target="_blank" aria-label="WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <script>
+        // ========================================
+        // VARIABLES GLOBALES DEL CARRUSEL
+        // ========================================
+        let currentIndex = 0;
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        const totalSlides = slides.length;
+        let autoplayInterval;
+
+        // ========================================
+        // FUNCIONES DEL CARRUSEL
+        // ========================================
+        function showSlide(index) {
+            // Validar rango
+            if (index >= totalSlides) {
+                currentIndex = 0;
+            } else if (index < 0) {
+                currentIndex = totalSlides - 1;
+            } else {
+                currentIndex = index;
+            }
+
+            // Remover clase active de todos los slides y dots
+            slides.forEach(slide => slide.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+
+            // Agregar clase active al slide y dot actual
+            slides[currentIndex].classList.add('active');
+            dots[currentIndex].classList.add('active');
+        }
+
+        function nextSlide() {
+            clearInterval(autoplayInterval);
+            showSlide(currentIndex + 1);
+            startAutoplay();
+        }
+
+        function previousSlide() {
+            clearInterval(autoplayInterval);
+            showSlide(currentIndex - 1);
+            startAutoplay();
+        }
+
+        function currentSlide(index) {
+            clearInterval(autoplayInterval);
+            showSlide(index);
+            startAutoplay();
+        }
+
+        function startAutoplay() {
+            autoplayInterval = setInterval(() => {
+                showSlide(currentIndex + 1);
+            }, 5000); // Cambiar cada 5 segundos
+        }
+
+        // Iniciar autoplay cuando carga la página
+        window.addEventListener('load', () => {
+            startAutoplay();
+        });
+
+        // ========================================
+        // MENÚ MÓVIL
+        // ========================================
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // ========================================
+        // FORMULARIO DE CONTACTO
+        // ========================================
+        function handleSubmit(e) {
+            e.preventDefault();
+            const company = document.getElementById('company').value;
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+            
+            let whatsappMessage = `Hola, soy ${name}.`;
+            if (company) whatsappMessage += ` Empresa: ${company}.`;
+            whatsappMessage += ` Teléfono: ${phone}.`;
+            if (email) whatsappMessage += ` Email: ${email}.`;
+            whatsappMessage += ` Mensaje: ${message}`;
+            
+            const whatsappURL = `https://wa.me/50662055092?text=${encodeURIComponent(whatsappMessage)}`;
+            window.open(whatsappURL, '_blank');
+            
+            return false;
+        }
+
+        // ========================================
+        // EFECTOS DE NAVBAR AL SCROLL
+        // ========================================
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
+            }
+        });
+
+        // ========================================
+        // CERRAR MENÚ MÓVIL AL HACER CLICK EN LINKS
+        // ========================================
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+    </script>
+</body>
+</html>
