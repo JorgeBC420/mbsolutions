@@ -463,16 +463,18 @@ background: #000;
 }
 
 .feature-icon {
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     background: var(--primary);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 0 auto 1.5rem;
-    font-size: 2rem;
+    font-size: 2.5rem;
     color: white;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    transition: all 0.3s ease;
 }
 
 .feature-item h4 {
@@ -544,6 +546,11 @@ background: #000;
     color: rgba(255, 255, 255, 0.9);
     text-decoration: none;
     font-size: 1rem;
+}
+
+.contact-map {
+    width: 100%;
+    overflow: hidden;
 }
 
 .contact-item a:hover {
