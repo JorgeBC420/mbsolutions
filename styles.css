@@ -657,6 +657,11 @@ footer {
     transform: translateY(-3px);
 }
 
+/* Ocultar botón de login */
+.social-links a:last-child {
+    display: none;
+}
+
 .footer-bottom {
     text-align: center;
     padding-top: 2rem;
