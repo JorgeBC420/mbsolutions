@@ -2,13 +2,38 @@
 // LÓGICA DE LA TIENDA PARA CLIENTE
 // ========================================
 
-let products = JSON.parse(localStorage.getItem('mbsolutions_products')) || [];
+const API_BASE = 'http://localhost:3000';
+
+let products = [];
 let selectedProduct = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    loadCategoryFilters();
-    renderProducts();
+    loadProducts();
 });
+
+// ========================================
+// CARGAR PRODUCTOS DEL BACKEND
+// ========================================
+
+async function loadProducts() {
+    try {
+        const response = await fetch(`${API_BASE}/api/productos`);
+        
+        if (!response.ok) {
+            throw new Error('Error al cargar productos');
+        }
+
+        products = await response.json();
+        loadCategoryFilters();
+        renderProducts();
+    } catch (error) {
+        console.error('Error al cargar productos:', error);
+        const grid = document.getElementById('productsGrid');
+        if (grid) {
+            grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:3rem; color: var(--error);">Error al cargar productos del servidor.</p>';
+        }
+    }
+}
 
 // ========================================
 // FUNCIONES DE CATEGORÍAS
@@ -37,9 +62,6 @@ function loadCategoryFilters() {
 function renderProducts(category = 'all') {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
-
-    // Recargar productos en caso de que hayan sido agregados desde admin
-    products = JSON.parse(localStorage.getItem('mbsolutions_products')) || [];
 
     const filtered = category === 'all' ? products : products.filter(p => p.category === category);
     

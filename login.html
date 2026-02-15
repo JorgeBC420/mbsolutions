@@ -238,11 +238,10 @@
     </div>
 
     <script>
-        // Credenciales (en producción, esto debería estar en el servidor)
-        const ADMIN_USER = 'jmbravoc';
-        const ADMIN_PASS = '07may2025';
+        // API base URL
+        const API_BASE = 'http://localhost:3000';
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
 
             const username = document.getElementById('username').value;
@@ -253,39 +252,68 @@
 
             // Limpiar error previo
             errorMessage.classList.remove('show');
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
-            // Validar credenciales
-            if (username === ADMIN_USER && password === ADMIN_PASS) {
-                // Credenciales correctas
-                loginBtn.disabled = true;
-                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            try {
+                // Enviar credenciales al servidor
+                const response = await fetch(`${API_BASE}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        usuario: username,
+                        contraseña: password
+                    })
+                });
 
-                // Guardar token en sessionStorage (solo para esta sesión)
-                sessionStorage.setItem('adminToken', 'authenticated_' + Date.now());
-                
-                // Redirigir al panel admin después de 500ms
-                setTimeout(() => {
-                    window.location.href = 'admin.html';
-                }, 500);
-            } else {
-                // Credenciales incorrectas
-                errorText.textContent = 'Usuario o contraseña incorrectos';
+                const data = await response.json();
+
+                if (response.ok && data.success && data.token) {
+                    // Autenticación exitosa
+                    // Guardar token en localStorage
+                    localStorage.setItem('adminToken', data.token);
+                    localStorage.setItem('adminUser', username);
+                    
+                    // Redirigir al panel admin después de 500ms
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 500);
+                } else {
+                    // Error en la autenticación
+                    errorText.textContent = data.error || 'Error en la autenticación';
+                    errorMessage.classList.add('show');
+                    
+                    // Limpiar campos
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+
+                    // Vibración y shake
+                    if (navigator.vibrate) {
+                        navigator.vibrate(200);
+                    }
+
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
+                }
+            } catch (error) {
+                // Error de conexión
+                errorText.textContent = 'Error de conexión con el servidor. ¿Está ejecutándose el backend?';
                 errorMessage.classList.add('show');
                 
-                // Limpiar campos
-                document.getElementById('password').value = '';
-                document.getElementById('password').focus();
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar';
 
-                // Vibración y shake (si el navegador lo soporta)
-                if (navigator.vibrate) {
-                    navigator.vibrate(200);
-                }
+                console.error('Error de autenticación:', error);
             }
         }
 
         // Verificar si ya está logueado
         window.addEventListener('load', () => {
-            if (sessionStorage.getItem('adminToken')) {
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                // Validar que el token sea válido antes de redirigir
                 window.location.href = 'admin.html';
             }
         });

@@ -420,10 +420,15 @@
     <!-- SCRIPTS -->
     <script>
         // ========================================
+        // CONFIGURACIÓN GLOBAL
+        // ========================================
+        const API_BASE = 'http://localhost:3000';
+
+        // ========================================
         // VERIFICACIÓN DE AUTENTICACIÓN
         // ========================================
         window.addEventListener('load', () => {
-            const adminToken = sessionStorage.getItem('adminToken');
+            const adminToken = localStorage.getItem('adminToken');
             if (!adminToken) {
                 window.location.href = 'login.html';
             }
@@ -431,7 +436,8 @@
 
         function handleLogout() {
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                sessionStorage.removeItem('adminToken');
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
                 window.location.href = 'login.html';
             }
         }
