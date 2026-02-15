@@ -150,7 +150,7 @@ function handleEmailSubmit(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
     grecaptcha.ready(function() {
-        grecaptcha.execute('TU_SITE_KEY_AQUI', {action: 'submit'}).then(function(token) {
+        grecaptcha.execute('6LeZvmwsAAAAAErJj7146IxsW9wxkLhj8nOnCNSH', {action: 'submit'}).then(function(token) {
             const name = document.getElementById('em-name').value;
             const email = document.getElementById('em-email').value;
             const msg = document.getElementById('em-message').value;
