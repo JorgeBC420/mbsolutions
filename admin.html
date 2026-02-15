@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MB Solutions CR - Panel de Administración</title>
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            margin-top: 80px;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+        }
+
+        .admin-header h1 {
+            font-size: 2.5rem;
+            color: var(--dark);
+        }
+
+        .admin-back-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .admin-back-btn:hover {
+            gap: 1rem;
+        }
+
+        .admin-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+        }
+
+        .admin-form-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .admin-list-section {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            max-height: 800px;
+            overflow-y: auto;
+        }
+
+        .admin-form-section h2,
+        .admin-list-section h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .image-preview-box {
+            width: 100%;
+            height: 250px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8f9fa;
+            margin-bottom: 1.5rem;
+            color: var(--gray);
+            overflow: hidden;
+        }
+
+        .image-preview-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        #productForm {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group-full {
+            grid-column: 1 / -1;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            grid-column: 1 / -1;
+            margin-top: 1rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 1rem;
+            background: var(--light);
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .product-item {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--primary);
+        }
+
+        .product-item-info h4 {
+            color: var(--dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .product-item-info p {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 0.2rem;
+        }
+
+        .product-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-small {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.85rem;
+        }
+
+        .btn-edit {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-edit:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-delete:hover {
+            background: #fecaca;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--light);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .file-input-label:hover {
+            background: #e2e8f0;
+        }
+
+        @media (max-width: 1024px) {
+            .admin-content {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-list-section {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-container {
+                padding: 1rem;
+            }
+
+            .admin-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR (misma que en index.html) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <img src="images/mbslogo.webp" alt="MB Solutions Logo" class="logo-img">
+                <div class="logo-text">MB Solutions</div>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#inicio">Inicio</a></li>
+                <li><a href="index.html#tienda">Tienda</a></li>
+                <li><a href="index.html#contacto" class="nav-cta">Contacto</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1><i class="fas fa-box"></i> Panel de Administración</h1>
+            <a href="index.html" class="admin-back-btn">
+                <i class="fas fa-arrow-left"></i> Volver a Tienda
+            </a>
+        </div>
+
+        <div class="admin-content">
+            <!-- FORMULARIO DE PRODUCTOS -->
+            <div class="admin-form-section">
+                <h2><i class="fas fa-plus-circle"></i> <span id="modalTitle">Nuevo Producto</span></h2>
+
+                <form id="productForm" onsubmit="saveProduct(event)">
+                    <!-- Vista Previa de Imagen -->
+                    <div class="image-preview-box" id="imagePreview">
+                        <p>La imagen aparecerá aquí</p>
+                    </div>
+
+                    <!-- Input de Imagen -->
+                    <div class="file-input-wrapper">
+                        <input type="file" id="productImage" accept="image/*" onchange="handleImageUpload(event)">
+                        <label for="productImage" class="file-input-label">
+                            <i class="fas fa-cloud-upload-alt"></i> Seleccionar Imagen
+                        </label>
+                    </div>
+
+                    <!-- Código -->
+                    <div class="form-group">
+                        <label for="productCode">Código del Producto *</label>
+                        <input type="text" id="productCode" required placeholder="Ej: LP-HP-001">
+                    </div>
+
+                    <!-- Nombre y Categoría -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productName">Nombre del Producto *</label>
+                            <input type="text" id="productName" required placeholder="Ej: Laptop HP Pavilion">
+                        </div>
+                        <div class="form-group">
+                            <label for="productCategory">Categoría *</label>
+                            <select id="productCategory" required>
+                                <option value="">Seleccionar categoría</option>
+                                <option value="laptops">Laptops</option>
+                                <option value="desktops">Computadoras</option>
+                                <option value="accesorios">Accesorios</option>
+                                <option value="componentes">Componentes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Precio y Stock -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="productPrice">Precio (₡) *</label>
+                            <input type="number" id="productPrice" required placeholder="Ej: 450000">
+                        </div>
+                        <div class="form-group">
+                            <label for="productStock">Stock *</label>
+                            <input type="number" id="productStock" required placeholder="Ej: 5">
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group form-group-full">
+                        <label for="productDescription">Descripción *</label>
+                        <textarea id="productDescription" required placeholder="Describe el producto..." rows="5"></textarea>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="btn-group">
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Guardar Producto
+                        </button>
+                        <button type="button" onclick="resetForm()" class="btn-secondary">
+                            <i class="fas fa-redo"></i> Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- LISTA DE PRODUCTOS -->
+            <div class="admin-list-section">
+                <h2><i class="fas fa-list"></i> Productos Registrados</h2>
+                <div id="productsList">
+                    <p style="text-align:center; color: var(--gray); padding: 2rem;">Cargando productos...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // ========================================
+        // MENÚ MÓVIL
+        // ========================================
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // ========================================
+        // EFECTOS DE NAVBAR AL SCROLL
+        // ========================================
+        window.addEventListener('scroll', () => {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.15)';
+            } else {
+                navbar.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.08)';
+            }
+        });
+
+        // ========================================
+        // CERRAR MENÚ MÓVIL AL HACER CLICK EN LINKS
+        // ========================================
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('navLinks').classList.remove('active');
+            });
+        });
+
+        // Se agregan estilos para select
+        const style = document.createElement('style');
+        style.textContent = `
+            select {
+                width: 100%;
+                padding: 1rem;
+                border: 1px solid #e2e8f0;
+                border-radius: 10px;
+                font-family: 'Inter', sans-serif;
+                font-size: 1rem;
+                transition: border-color 0.3s ease;
+            }
+            
+            select:focus {
+                outline: none;
+                border-color: var(--primary);
+                box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+    <!-- Script de administración -->
+    <script src="admin-script.js"></script>
+</body>
+</html>
