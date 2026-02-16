@@ -22,11 +22,18 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password';
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(express.static('public')); // Servir archivos estáticos
 
 // Crear carpeta data si no existe
 const dataDir = path.dirname(DB_PATH);
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
+}
+
+// Crear carpeta public/images si no existe
+const imagesDir = path.join(__dirname, 'public', 'images');
+if (!fs.existsSync(imagesDir)) {
+    fs.mkdirSync(imagesDir, { recursive: true });
 }
 
 // Inicializar archivo de productos vacío si no existe
@@ -72,6 +79,31 @@ function verificarToken(req, res, next) {
         next();
     } catch (error) {
         res.status(401).json({ error: 'Token inválido' });
+    }
+}
+
+function guardarImagen(base64Str) {
+    try {
+        // Si no hay imagen, retornar placeholder
+        if (!base64Str || base64Str === 'images/placeholder.jpg') {
+            return 'images/placeholder.jpg';
+        }
+
+        // Generar nombre único para el archivo
+        const timestamp = Date.now();
+        const filename = `producto_${timestamp}.png`;
+        
+        // Decodificar Base64 (manejo de data URI format)
+        const base64Data = base64Str.replace(/^data:image\/(png|jpg|jpeg|gif);base64,/, '');
+        const filepath = path.join(__dirname, 'public', 'images', filename);
+        
+        // Guardar archivo
+        fs.writeFileSync(filepath, Buffer.from(base64Data, 'base64'));
+        
+        return `images/${filename}`;
+    } catch (error) {
+        console.error('Error al guardar imagen:', error);
+        return 'images/placeholder.jpg';
     }
 }
 
@@ -148,6 +180,9 @@ app.post('/api/productos', verificarToken, (req, res) => {
             productos = [];
         }
 
+        // Guardar imagen y obtener nombre del archivo
+        const nombreImagen = guardarImagen(image);
+
         // Crear nuevo producto
         const nuevoProducto = {
             id: Date.now(),
@@ -157,7 +192,7 @@ app.post('/api/productos', verificarToken, (req, res) => {
             price: parseInt(price) || 0,
             stock: parseInt(stock) || 0,
             description: String(description),
-            image: image || 'images/placeholder.jpg',
+            image: nombreImagen,
             createdAt: new Date().toISOString()
         };
 
@@ -193,7 +228,10 @@ app.put('/api/productos/:id', verificarToken, (req, res) => {
         if (price !== undefined) productos[index].price = parseInt(price) || 0;
         if (stock !== undefined) productos[index].stock = parseInt(stock) || 0;
         if (description !== undefined) productos[index].description = String(description);
-        if (image !== undefined) productos[index].image = String(image);
+        if (image !== undefined) {
+            const nombreImagen = guardarImagen(image);
+            productos[index].image = nombreImagen;
+        }
         productos[index].updatedAt = new Date().toISOString();
 
         guardarProductos(productos);
