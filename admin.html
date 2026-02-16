@@ -298,6 +298,8 @@
             }
         }
     </style>
+    <!-- Configuración de API - Detecta automáticamente prod/dev -->
+    <script src="api-config.js"></script>
 </head>
 <body>
     <!-- NAVBAR (misma que en index.html) -->
@@ -422,7 +424,8 @@
         // ========================================
         // CONFIGURACIÓN GLOBAL
         // ========================================
-        const API_BASE = 'http://localhost:3000';
+        // API_BASE definido en api-config.js
+        // Se adapta automáticamente según el dominio
 
         // ========================================
         // VERIFICACIÓN DE AUTENTICACIÓN

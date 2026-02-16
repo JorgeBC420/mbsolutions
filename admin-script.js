@@ -1,8 +1,8 @@
 // ========================================
 // LÓGICA DEL PANEL DE ADMINISTRACIÓN
 // ========================================
-
-const API_BASE = 'http://localhost:3000';
+// API_BASE se define en api-config.js
+// Se adapta automáticamente según el dominio
 
 let currentEditingId = null;
 let currentImageBase64 = "";

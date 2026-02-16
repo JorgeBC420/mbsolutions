@@ -1,8 +1,8 @@
 // ========================================
 // LÓGICA DE LA TIENDA PARA CLIENTE
 // ========================================
-
-const API_BASE = 'http://localhost:3000';
+// API_BASE se define en api-config.js
+// Se adapta automáticamente según el dominio
 
 let products = [];
 let selectedProduct = null;
