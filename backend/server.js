@@ -48,7 +48,12 @@ function leerProductos() {
 }
 
 function guardarProductos(productos) {
-    fs.writeFileSync(DB_PATH, JSON.stringify(productos, null, 2));
+    try {
+        fs.writeFileSync(DB_PATH, JSON.stringify(productos, null, 2));
+    } catch (error) {
+        console.error('Error al guardar productos:', error);
+        throw new Error('No se pudieron guardar los productos: ' + error.message);
+    }
 }
 
 function generarToken(usuario) {
@@ -132,23 +137,31 @@ app.post('/api/productos', verificarToken, (req, res) => {
     try {
         const { code, name, category, price, stock, description, image } = req.body;
 
-        if (!code || !name || !category || !price || !stock === undefined || !description) {
+        // Validación mejorada
+        if (!code || !name || !category || price === undefined || stock === undefined || !description) {
             return res.status(400).json({ error: 'Faltan campos requeridos' });
         }
 
-        const productos = leerProductos();
+        // Leer productos actuales
+        let productos = leerProductos();
+        if (!Array.isArray(productos)) {
+            productos = [];
+        }
+
+        // Crear nuevo producto
         const nuevoProducto = {
             id: Date.now(),
-            code,
-            name,
-            category,
-            price: parseInt(price),
-            stock: parseInt(stock),
-            description,
+            code: String(code),
+            name: String(name),
+            category: String(category),
+            price: parseInt(price) || 0,
+            stock: parseInt(stock) || 0,
+            description: String(description),
             image: image || 'images/placeholder.jpg',
             createdAt: new Date().toISOString()
         };
 
+        // Guardar
         productos.push(nuevoProducto);
         guardarProductos(productos);
 
@@ -158,31 +171,30 @@ app.post('/api/productos', verificarToken, (req, res) => {
             product: nuevoProducto
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear producto' });
+        console.error('Error al crear producto:', error);
+        res.status(500).json({ error: 'Error al crear producto: ' + error.message });
     }
 });
 
 app.put('/api/productos/:id', verificarToken, (req, res) => {
     try {
         const { code, name, category, price, stock, description, image } = req.body;
-        const productos = leerProductos();
+        let productos = leerProductos();
         const index = productos.findIndex(p => p.id === parseInt(req.params.id));
 
         if (index === -1) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        productos[index] = {
-            ...productos[index],
-            code: code || productos[index].code,
-            name: name || productos[index].name,
-            category: category || productos[index].category,
-            price: price !== undefined ? parseInt(price) : productos[index].price,
-            stock: stock !== undefined ? parseInt(stock) : productos[index].stock,
-            description: description || productos[index].description,
-            image: image || productos[index].image,
-            updatedAt: new Date().toISOString()
-        };
+        // Actualizar solo los campos proporcionados
+        if (code !== undefined) productos[index].code = String(code);
+        if (name !== undefined) productos[index].name = String(name);
+        if (category !== undefined) productos[index].category = String(category);
+        if (price !== undefined) productos[index].price = parseInt(price) || 0;
+        if (stock !== undefined) productos[index].stock = parseInt(stock) || 0;
+        if (description !== undefined) productos[index].description = String(description);
+        if (image !== undefined) productos[index].image = String(image);
+        productos[index].updatedAt = new Date().toISOString();
 
         guardarProductos(productos);
 
@@ -192,13 +204,14 @@ app.put('/api/productos/:id', verificarToken, (req, res) => {
             product: productos[index]
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar producto' });
+        console.error('Error al actualizar producto:', error);
+        res.status(500).json({ error: 'Error al actualizar producto: ' + error.message });
     }
 });
 
 app.delete('/api/productos/:id', verificarToken, (req, res) => {
     try {
-        const productos = leerProductos();
+        let productos = leerProductos();
         const index = productos.findIndex(p => p.id === parseInt(req.params.id));
 
         if (index === -1) {
@@ -215,7 +228,8 @@ app.delete('/api/productos/:id', verificarToken, (req, res) => {
             product: productoEliminado
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar producto' });
+        console.error('Error al eliminar producto:', error);
+        res.status(500).json({ error: 'Error al eliminar producto: ' + error.message });
     }
 });
 
@@ -236,7 +250,7 @@ app.get('/api/health', (req, res) => {
 // ========================================
 
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor MB Solutions ejecutándose en http://localhost:${PORT}`);
-    console.log(`📦 Base de datos: ${DB_PATH}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`[OK] Servidor MB Solutions ejecutándose en puerto ${PORT}`);
+    console.log(`[DB] Base de datos: ${DB_PATH}`);
+    console.log(`[ENV] Modo: ${process.env.NODE_ENV || 'development'}`);
 });
