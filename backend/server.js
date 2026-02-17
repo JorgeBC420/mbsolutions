@@ -85,24 +85,53 @@ function verificarToken(req, res, next) {
 function guardarImagen(base64Str) {
     try {
         // Si no hay imagen, retornar placeholder
-        if (!base64Str || base64Str === 'images/placeholder.jpg') {
+        if (!base64Str || base64Str === 'images/placeholder.jpg' || base64Str === '') {
             return 'images/placeholder.jpg';
         }
 
+        console.log('[IMG] Iniciando guardado de imagen...');
+        
         // Generar nombre único para el archivo
         const timestamp = Date.now();
         const filename = `producto_${timestamp}.png`;
-        
-        // Decodificar Base64 (manejo de data URI format)
-        const base64Data = base64Str.replace(/^data:image\/(png|jpg|jpeg|gif);base64,/, '');
         const filepath = path.join(__dirname, 'public', 'images', filename);
         
-        // Guardar archivo
-        fs.writeFileSync(filepath, Buffer.from(base64Data, 'base64'));
+        console.log('[IMG] Path de guardado:', filepath);
+        console.log('[IMG] Directorio existe:', fs.existsSync(path.join(__dirname, 'public', 'images')));
         
+        // Validar que la carpeta exista
+        const imagesDir = path.join(__dirname, 'public', 'images');
+        if (!fs.existsSync(imagesDir)) {
+            console.log('[IMG] Creando directorio de imágenes...');
+            fs.mkdirSync(imagesDir, { recursive: true });
+        }
+        
+        // Decodificar Base64 (manejo de data URI format)
+        let base64Data = base64Str.replace(/^data:image\/(png|jpg|jpeg|gif);base64,/, '');
+        
+        // Validar que tengan datos Base64
+        if (!base64Data || base64Data.length < 10) {
+            console.warn('[IMG] Base64 inválido o muy corto, usando placeholder');
+            return 'images/placeholder.jpg';
+        }
+        
+        // Intentar decodificar para validar
+        const buffer = Buffer.from(base64Data, 'base64');
+        if (buffer.length < 10) {
+            console.warn('[IMG] Buffer decodificado muy pequeño, usando placeholder');
+            return 'images/placeholder.jpg';
+        }
+        
+        console.log('[IMG] Buffer size:', buffer.length, 'bytes');
+        
+        // Guardar archivo
+        fs.writeFileSync(filepath, buffer);
+        
+        console.log('[IMG] Imagen guardada exitosamente:', filename);
         return `images/${filename}`;
     } catch (error) {
-        console.error('Error al guardar imagen:', error);
+        console.error('[IMG] Error crítico al guardar imagen:', error.message);
+        console.error('[IMG] Stack:', error.stack);
         return 'images/placeholder.jpg';
     }
 }
@@ -181,7 +210,9 @@ app.post('/api/productos', verificarToken, (req, res) => {
         }
 
         // Guardar imagen y obtener nombre del archivo
+        console.log('[DB] Guardando producto - Code:', code);
         const nombreImagen = guardarImagen(image);
+        console.log('[DB] Imagen guardada como:', nombreImagen);
 
         // Crear nuevo producto
         const nuevoProducto = {
