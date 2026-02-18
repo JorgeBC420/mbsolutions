@@ -424,6 +424,18 @@ app.post('/api/enviar-pedido', async (req, res) => {
 });
 
 // ========================================
+// RUTAS DE PÁGINAS ADMIN
+// ========================================
+
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html'));
+});
+
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'admin', 'admin.html'));
+});
+
+// ========================================
 // RUTA DE PRUEBA
 // ========================================
 

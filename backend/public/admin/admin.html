@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="../../styles.css">
     <style>
         .admin-container {
             max-width: 1400px;
@@ -299,14 +299,14 @@
         }
     </style>
     <!-- Configuración de API - Detecta automáticamente prod/dev -->
-    <script src="api-config.js"></script>
+    <script src="../../api-config.js"></script>
 </head>
 <body>
     <!-- NAVBAR (misma que en index.html) -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo-container">
-                <img src="images/mbslogo.webp" alt="MB Solutions Logo" class="logo-img">
+                <img src="../../images/mbslogo.webp" alt="MB Solutions Logo" class="logo-img">
                 <div class="logo-text">MB Solutions</div>
             </div>
             <div class="nav-toggle" onclick="toggleMenu()">
@@ -315,9 +315,9 @@
                 <span></span>
             </div>
             <ul class="nav-links" id="navLinks">
-                <li><a href="index.html#inicio">Inicio</a></li>
-                <li><a href="index.html#tienda">Tienda</a></li>
-                <li><a href="index.html#contacto" class="nav-cta">Contacto</a></li>
+                <li><a href="/#inicio">Inicio</a></li>
+                <li><a href="/#tienda">Tienda</a></li>
+                <li><a href="/#contacto" class="nav-cta">Contacto</a></li>
             </ul>
         </div>
     </nav>
@@ -327,7 +327,7 @@
         <div class="admin-header">
             <h1><i class="fas fa-box"></i> Panel de Administración</h1>
             <div class="admin-header-actions">
-                <a href="index.html" class="admin-back-btn">
+                <a href="/" class="admin-back-btn">
                     <i class="fas fa-arrow-left"></i> Volver a Tienda
                 </a>
                 <button onclick="handleLogout()" class="admin-logout-btn">
@@ -433,7 +433,7 @@
         window.addEventListener('load', () => {
             const adminToken = localStorage.getItem('adminToken');
             if (!adminToken) {
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             }
         });
 
@@ -441,7 +441,7 @@
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
                 localStorage.removeItem('adminToken');
                 localStorage.removeItem('adminUser');
-                window.location.href = 'login.html';
+                window.location.href = '/login';
             }
         }
 
