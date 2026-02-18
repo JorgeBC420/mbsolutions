@@ -56,6 +56,16 @@ function getAuthHeaders() {
     };
 }
 
+// URL de imagen de producto (igual que en shop-logic.js)
+function getProductImageUrl(imagePath) {
+    if (!imagePath || imagePath === 'images/placeholder.jpg') {
+        return 'images/placeholder.jpg';
+    }
+    const filename = imagePath.replace(/^images\//, '');
+    const base = (typeof API_BASE !== 'undefined' ? API_BASE : '');
+    return base + '/api/images/' + filename;
+}
+
 // ========================================
 // MANEJO DE IMAGEN
 // ========================================
@@ -150,7 +160,8 @@ async function editProduct(id) {
         currentImageBase64 = product.image;
         const preview = document.getElementById('imagePreview');
         if (preview && product.image) {
-            preview.innerHTML = `<img src="${product.image}" style="width:100%; height:100%; object-fit:contain;">`;
+            const imgUrl = getProductImageUrl(product.image);
+            preview.innerHTML = `<img src="${imgUrl}" style="width:100%; height:100%; object-fit:contain;">`;
         }
 
         // Cambiar título del modal

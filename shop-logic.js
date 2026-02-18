@@ -7,6 +7,15 @@
 let products = [];
 let selectedProduct = null;
 
+// Construir URL de imagen de producto (funciona en desarrollo y producción)
+function getProductImageUrl(imagePath) {
+    if (!imagePath || imagePath === 'images/placeholder.jpg') {
+        return 'images/placeholder.jpg';
+    }
+    const filename = imagePath.replace(/^images\//, '');
+    return `${API_BASE}/api/images/${filename}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadProducts();
 });
@@ -72,7 +81,7 @@ function renderProducts(category = 'all') {
 
     grid.innerHTML = filtered.map(p => `
         <div class="product-card" onclick="openProductModal(${p.id})">
-            <img src="${p.image || 'images/placeholder.jpg'}" class="product-image" alt="${p.name}">
+            <img src="${getProductImageUrl(p.image)}" class="product-image" alt="${p.name}">
             <div class="product-info">
                 <span class="product-category">${p.category}</span>
                 <h3 class="product-name">${p.name}</h3>
@@ -101,7 +110,7 @@ function openProductModal(productId) {
     selectedProduct = products.find(p => p.id === productId);
     if (!selectedProduct) return;
     
-    document.getElementById('modalProductImage').src = selectedProduct.image || 'images/placeholder.jpg';
+    document.getElementById('modalProductImage').src = getProductImageUrl(selectedProduct.image);
     document.getElementById('modalProductName').textContent = selectedProduct.name;
     document.getElementById('modalProductCode').textContent = selectedProduct.code;
     document.getElementById('modalProductPrice').textContent = `₡${parseInt(selectedProduct.price).toLocaleString()}`;

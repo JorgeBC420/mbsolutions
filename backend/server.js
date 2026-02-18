@@ -84,22 +84,8 @@ if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
 }
 
-// Crear carpeta para imágenes (intentar múltiples ubicaciones posibles)
-const possibleImageDirs = [
-    path.join(__dirname__, '..', '..', 'public_html', 'images'), // BanaHosting estructura
-    path.join(__dirname__, '..', 'images'), // Estructura alternativa
-    path.join(__dirname__, 'public', 'images'), // Estructura local
-];
-let imagesDir = possibleImageDirs.find(dir => {
-    try {
-        if (fs.existsSync(path.dirname(dir))) {
-            return true;
-        }
-    } catch (e) {
-        return false;
-    }
-    return false;
-}) || possibleImageDirs[0]; // Fallback al primero
+// Carpeta de imágenes: SIEMPRE backend/public/images para que express.static('public') las sirva en /images/
+const imagesDir = path.join(__dirname__, 'public', 'images');
 
 if (!fs.existsSync(imagesDir)) {
     try {
@@ -153,13 +139,8 @@ function guardarImagen(base64Str) {
         // Generar nombre único para el archivo
         const timestamp = Date.now();
         const filename = `producto_${timestamp}.png`;
-        // Usar la misma lógica de detección de carpeta de imágenes
-        const possibleImageDirs = [
-            path.join(__dirname__, '..', '..', 'public_html', 'images'),
-            path.join(__dirname__, '..', 'images'),
-            path.join(__dirname__, 'public', 'images'),
-        ];
-        let imagesPath = possibleImageDirs.find(dir => fs.existsSync(path.dirname(dir))) || possibleImageDirs[0];
+        // Siempre guardar en public/images para que express.static('public') sirva en /images/
+        const imagesPath = path.join(__dirname__, 'public', 'images');
         const filepath = path.join(imagesPath, filename);
         
         console.log('[IMG] Path de guardado:', filepath);
@@ -282,6 +263,22 @@ app.get('/api/productos/:id', (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error al leer producto' });
     }
+});
+
+// ========================================
+// RUTA PARA SERVIR IMÁGENES DE PRODUCTOS
+// ========================================
+// Permite que las imágenes funcionen aunque el frontend esté en otra ruta o dominio
+app.get('/api/images/:filename', (req, res) => {
+    const filename = req.params.filename;
+    if (!filename || filename.includes('..')) {
+        return res.status(400).send('Nombre de archivo inválido');
+    }
+    const imagePath = path.join(__dirname__, 'public', 'images', filename);
+    if (!fs.existsSync(imagePath)) {
+        return res.status(404).send('Imagen no encontrada');
+    }
+    res.sendFile(imagePath);
 });
 
 // ========================================
