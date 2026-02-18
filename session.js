@@ -31,7 +31,7 @@ function logoutSession(reason) {
     localStorage.removeItem('authToken');
     localStorage.removeItem('usuario');
     alert(reason + '. Por favor, inicie sesión nuevamente.');
-    window.location.href = '/login';
+    window.location.href = 'login.html';
 }
 
 // Cerrar sesión manualmente
@@ -42,7 +42,7 @@ function logout() {
     }
     localStorage.removeItem('authToken');
     localStorage.removeItem('usuario');
-    window.location.href = '/login';
+    window.location.href = 'login.html';
 }
 
 // Detectar actividad del usuario
