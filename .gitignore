@@ -1,0 +1,32 @@
+# Node.js
+node_modules/
+npm-debug.log*
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentos privados (NO SERVIR PÚBLICAMENTE)
+backend/docs/
+backend/data/pedidos.json
+
+# Imágenes de productos
+backend/public/images/*
+!backend/public/images/.gitkeep
+
+# Archivos temporales
+*.tmp
+.cache/

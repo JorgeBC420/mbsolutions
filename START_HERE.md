@@ -26,8 +26,8 @@ cd C:\Users\bjorg\OneDrive\Desktop\mbsolutions
 📦 Dependencias ya están instaladas
 ✅ Archivo .env configurado
 🌐 URL: http://localhost:3000
-👤 Usuario Admin: jmbravoc
-🔑 Contraseña: 07may2025
+👤 Usuario Admin: Ver `backend/docs/SETUP_PRIVADO.md`
+🔑 Contraseña: Ver `backend/docs/SETUP_PRIVADO.md`
 🚀 Iniciando servidor...
    Presiona Ctrl+C para detener el servidor
 ```
@@ -47,8 +47,8 @@ file:///C:/Users/bjorg/OneDrive/Desktop/mbsolutions/login.html
 ```
 
 Credenciales:
-- Usuario: `jmbravoc`
-- Contraseña: `07may2025`
+- Usuario: Ver credenciales en `backend/docs/SETUP_PRIVADO.md`
+- Contraseña: Ver credenciales en `backend/docs/SETUP_PRIVADO.md`
 
 ---
 
@@ -107,8 +107,8 @@ fetch('http://localhost:3000/api/login', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-        usuario: 'jmbravoc',
-        contraseña: '07may2025'
+        usuario: 'Ver backend/docs/SETUP_PRIVADO.md',
+        contraseña: 'Ver backend/docs/SETUP_PRIVADO.md'
     })
 })
 .then(r => r.json())

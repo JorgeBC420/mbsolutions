@@ -54,8 +54,10 @@ Environment: development
    - O ve a la página `login.html`
 
 ### Credenciales de Admin
-- **Usuario:** `jmbravoc`
-- **Contraseña:** `07may2025`
+
+**⚠️ Ver `backend/docs/SETUP_PRIVADO.md` para credenciales**
+
+(Las credenciales no se muestran aquí por seguridad)
 
 ## Flujo de Operación
 
@@ -118,7 +120,7 @@ mbsolutions/
 ### Autenticación
 ```
 POST /api/login
-Body: { usuario: "jmbravoc", contraseña: "07may2025" }
+Body: { usuario: "Ver SETUP_PRIVADO.md", contraseña: "Ver SETUP_PRIVADO.md" }
 Response: { success: true, token: "eyJ..." }
 ```
 

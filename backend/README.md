@@ -19,8 +19,8 @@ npm install
 
 El archivo `.env` ya está configurado con:
 - `PORT=3000` - Puerto del servidor
-- `ADMIN_USER=jmbravoc` - Usuario administrador
-- `ADMIN_PASSWORD=07may2025` - Contraseña administrador
+- `ADMIN_USER=xxx` - Usuario administrador (ver `docs/SETUP_PRIVADO.md`)
+- `ADMIN_PASSWORD=xxx` - Contraseña administrador (ver `docs/SETUP_PRIVADO.md`)
 - `JWT_SECRET=your_super_secret_jwt_key_change_in_production` - Clave secreta JWT
 - `DB_PATH=./data/productos.json` - Ruta de base de datos
 
