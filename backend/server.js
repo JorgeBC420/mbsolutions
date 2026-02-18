@@ -21,7 +21,7 @@ const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password';
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' })); // Aumentar límite para imágenes Base64
 app.use(express.static('public')); // Servir archivos estáticos
 
 // Crear carpeta data si no existe
@@ -134,7 +134,7 @@ function guardarImagen(base64Str) {
         console.error('[IMG] Stack:', error.stack);
         return 'images/placeholder.jpg';
     }
-}}
+}
 
 // ========================================
 // RUTAS DE AUTENTICACIÓN
