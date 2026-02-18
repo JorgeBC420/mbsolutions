@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret_key';
+// Usar el mismo JWT_SECRET que server.js (debe venir de .env)
+const JWT_SECRET = process.env.JWT_SECRET || 'CHANGE_THIS_IN_PRODUCTION_' + Date.now();
 
 export function verificarToken(req, res, next) {
     const authHeader = req.headers.authorization;
