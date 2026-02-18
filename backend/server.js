@@ -31,7 +31,7 @@ if (!fs.existsSync(dataDir)) {
 }
 
 // Crear carpeta public/images si no existe
-const imagesDir = path.join(__dirname, 'public', 'images');
+const imagesDir = path.join(__dirname, '..', 'images');
 if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true });
 }
@@ -94,16 +94,16 @@ function guardarImagen(base64Str) {
         // Generar nombre único para el archivo
         const timestamp = Date.now();
         const filename = `producto_${timestamp}.png`;
-        const filepath = path.join(__dirname, 'public', 'images', filename);
+        const imagesPath = path.join(__dirname, '..', 'images');
+        const filepath = path.join(imagesPath, filename);
         
         console.log('[IMG] Path de guardado:', filepath);
-        console.log('[IMG] Directorio existe:', fs.existsSync(path.join(__dirname, 'public', 'images')));
+        console.log('[IMG] Directorio existe:', fs.existsSync(imagesPath));
         
         // Validar que la carpeta exista
-        const imagesDir = path.join(__dirname, 'public', 'images');
-        if (!fs.existsSync(imagesDir)) {
+        if (!fs.existsSync(imagesPath)) {
             console.log('[IMG] Creando directorio de imágenes...');
-            fs.mkdirSync(imagesDir, { recursive: true });
+            fs.mkdirSync(imagesPath, { recursive: true });
         }
         
         // Decodificar Base64 (manejo de data URI format)
@@ -134,7 +134,7 @@ function guardarImagen(base64Str) {
         console.error('[IMG] Stack:', error.stack);
         return 'images/placeholder.jpg';
     }
-}
+}}
 
 // ========================================
 // RUTAS DE AUTENTICACIÓN
