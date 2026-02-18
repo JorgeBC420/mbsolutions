@@ -4,7 +4,7 @@
 
 // Detecta automáticamente si estás en desarrollo o producción
 // Desarrollo: http://localhost:3000  
-// Producción: https://mbsolutionscr.com
+// Producción: rutas relativas /api (funciona con Passenger en BanaHosting)
 
 const API_BASE = (() => {
     const host = window.location.hostname;
@@ -16,12 +16,13 @@ const API_BASE = (() => {
     
     // Si estás en GitHub Pages (para testing)
     if (host === 'jorgebc420.github.io') {
-        return 'http://localhost:3000'; // Cambiar cuando se suba a producción
+        return 'http://localhost:3000';
     }
     
-    // En producción (mbsolutionscr.com)
-    // Usa el mismo dominio con /api (ej: https://mbsolutionscr.com)
-    return `https://${host}`;
+    // En producción (mbsolutionscr.com o cualquier dominio)
+    // Usa rutas relativas - funciona con Passenger/reverse proxy en BanaHosting
+    // Las llamadas irán a /api/, que Passenger redirige al puerto del Node.js app
+    return '';
 })();
 
-console.log(`[API Config] Usando endpoint: ${API_BASE}`);
+console.log(`[API Config] Host: ${window.location.hostname}`);

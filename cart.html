@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito - MB Solutions</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .carrito-container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .carrito-vacio {
+            text-align: center;
+            padding: 60px 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .carrito-vacio p {
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+        }
+        
+        #cartTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        #cartTable thead {
+            background: #333;
+            color: white;
+        }
+        
+        #cartTable th, #cartTable td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        #cartTable td {
+            padding: 12px 15px;
+        }
+        
+        #cartTable input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-remove:hover {
+            background: #c0392b;
+        }
+        
+        .carrito-resumen {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: right;
+        }
+        
+        .resumen-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            font-size: 16px;
+        }
+        
+        .resumen-total {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+            border-top: 2px solid #ddd;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        
+        .botones-carrito {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .btn-comprar {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .btn-comprar:hover {
+            background: #229954;
+        }
+        
+        .btn-continuar {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-continuar:hover {
+            background: #2980b9;
+        }
+        
+        .form-pedido {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .form-pedido h3 {
+            margin-top: 0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <h1>MB Solutions CR</h1>
+        <nav>
+            <a href="index.html">Tienda</a>
+            <a href="cart.html" class="active">Carrito (<span class="cart-count" style="display:none;">0</span>)</a>
+            <button id="btnLogout" style="display:none;">Logout</button>
+        </nav>
+    </header>
+
+    <!-- Contenido Carrito -->
+    <div class="carrito-container">
+        <h2>Mi Carrito</h2>
+        
+        <div id="carritoVacio" class="carrito-vacio" style="display:none;">
+            <p>Tu carrito está vacío</p>
+            <a href="index.html" class="btn-continuar">Continuar comprando</a>
+        </div>
+        
+        <div id="carritoLleno" style="display:none;">
+            <table id="cartTable">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Subtotal</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            
+            <div class="carrito-resumen">
+                <div class="resumen-item">
+                    <span>Subtotal:</span>
+                    <span id="cartSubtotal">$0.00</span>
+                </div>
+                <div class="resumen-item">
+                    <span>Impuesto:</span>
+                    <span id="cartTax">$0.00</span>
+                </div>
+                <div class="resumen-total">
+                    <span>Total: </span>
+                    <span id="cartTotal">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="botones-carrito">
+                <a href="index.html" class="btn-continuar">Continuar comprando</a>
+                <button class="btn-comprar" onclick="mostrarFormularioPedido()">Proceder al Pago</button>
+            </div>
+            
+            <!-- Formulario de Pedido -->
+            <div class="form-pedido" id="formularioPedido" style="display:none;">
+                <h3>Información de Pedido</h3>
+                <form onsubmit="enviarPedido(event)">
+                    <div class="form-group">
+                        <label>Nombre *</label>
+                        <input type="text" id="nombreCliente" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="emailCliente" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="telefonoCliente">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Dirección *</label>
+                        <input type="text" id="direccionCliente" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notas Especiales</label>
+                        <textarea id="notasCliente" placeholder="Ej: Preferencias de pago, horario de entrega, etc."></textarea>
+                    </div>
+                    
+                    <div class="botones-carrito">
+                        <button type="button" class="btn-continuar" onclick="ocultarFormularioPedido()">Cancelar</button>
+                        <button type="submit" class="btn-comprar">Enviar Pedido</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-config.js"></script>
+    <script src="cart.js"></script>
+    <script src="session.js"></script>
+    
+    <script>
+        // Mostrar/Ocultar carrito
+        function mostrarCarrito() {
+            const cart = getCart();
+            const carritoVacio = document.getElementById('carritoVacio');
+            const carritoLleno = document.getElementById('carritoLleno');
+            
+            if (cart.length === 0) {
+                carritoVacio.style.display = 'block';
+                carritoLleno.style.display = 'none';
+            } else {
+                carritoVacio.style.display = 'none';
+                carritoLleno.style.display = 'block';
+                displayCart();
+                actualizarResumen();
+            }
+        }
+        
+        // Actualizar resumen
+        function actualizarResumen() {
+            const total = getCartTotal();
+            const tax = total * 0.13; // 13% IVA Costa Rica
+            const totalConImpuesto = total + tax;
+            
+            document.getElementById('cartSubtotal').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('cartTax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = `$${totalConImpuesto.toFixed(2)}`;
+        }
+        
+        // Mostrar formulario de pedido
+        function mostrarFormularioPedido() {
+            document.getElementById('formularioPedido').style.display = 'block';
+            document.querySelector('.form-pedido').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Ocultar formulario de pedido
+        function ocultarFormularioPedido() {
+            document.getElementById('formularioPedido').style.display = 'none';
+        }
+        
+        // Enviar pedido
+        async function enviarPedido(event) {
+            event.preventDefault();
+            
+            const cart = getCart();
+            if (cart.length === 0) {
+                alert('El carrito está vacío');
+                return;
+            }
+            
+            const pedido = {
+                cliente: {
+                    nombre: document.getElementById('nombreCliente').value,
+                    email: document.getElementById('emailCliente').value,
+                    telefono: document.getElementById('telefonoCliente').value,
+                    direccion: document.getElementById('direccionCliente').value,
+                    notas: document.getElementById('notasCliente').value
+                },
+                productos: cart,
+                total: getCartTotal(),
+                fecha: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/enviar-pedido`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(pedido)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('¡Pedido enviado exitosamente! Pronto nos pondremos en contacto.');
+                    clearCart();
+                    mostrarCarrito();
+                    ocultarFormularioPedido();
+                } else {
+                    alert('Error: ' + (data.error || 'Error al enviar pedido'));
+                }
+            } catch (error) {
+                console.error('Error al enviar pedido:', error);
+                alert('Error de conexión: ' + error.message);
+            }
+        }
+        
+        // Logout
+        const btnLogout = document.getElementById('btnLogout');
+        if (btnLogout) {
+            btnLogout.addEventListener('click', logout);
+        }
+        
+        // Mostrar botón logout si hay sesión
+        if (localStorage.getItem('authToken')) {
+            btnLogout.style.display = 'inline';
+        }
+        
+        // Inicializar página
+        window.addEventListener('load', mostrarCarrito);
+    </script>
+</body>
+</html>

@@ -38,6 +38,7 @@
                 <li><a href="#tienda">Tienda</a></li>
                 <li><a href="#nosotros">Nosotros</a></li>
                 <li><a href="#contacto" class="nav-cta">Contacto</a></li>
+                <li><a href="cart.html" style="position: relative;">🛒 Carrito <span class="cart-count" style="display:none; position: absolute; top: -5px; right: -10px; background: #e74c3c; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 12px;">0</span></a></li>
             </ul>
         </div>
     </nav>
@@ -163,8 +164,11 @@
                             <p id="modalProductDescription"></p>
                         </div>
                         <div class="product-actions">
-                            <button class="btn btn-primary" onclick="contactProduct()" style="width: 100%; justify-content: center;">
-                                <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
+                            <button class="btn btn-primary" onclick="addProductToCart()" style="width: 48%; justify-content: center; background: #27ae60;">
+                                <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+                            </button>
+                            <button class="btn btn-primary" onclick="contactProduct()" style="width: 48%; justify-content: center;">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
                             </button>
                         </div>
                     </div>
@@ -235,7 +239,8 @@
                 <div class="social-links">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="login.html" title="Admin"><i class="fas fa-lock"></i></a>
+                    <a href="login.html" id="btnLogin" title="Admin"><i class="fas fa-lock"></i></a>
+                    <button id="btnLogoutHeader" style="display:none; background: none; border: none; cursor: pointer; color: inherit; font-size: 18px;" title="Logout"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
 
                 <!-- MAPA -->
@@ -414,6 +419,20 @@
     </script>
 
     <!-- Scripts de Tienda y Contacto -->
+    <script src="cart.js"></script>
+    <script src="session.js"></script>
     <script src="shop-logic.js"></script>
+    <script>
+        // Mostrar/Ocultar botón de logout
+        const btnLogin = document.getElementById('btnLogin');
+        const btnLogoutHeader = document.getElementById('btnLogoutHeader');
+        
+        if (localStorage.getItem('authToken')) {
+            btnLogin.style.display = 'none';
+            btnLogoutHeader.style.display = 'inline';
+        }
+        
+        btnLogoutHeader.addEventListener('click', logout);
+    </script>
 </body>
 </html>

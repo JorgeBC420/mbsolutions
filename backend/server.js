@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 
@@ -299,6 +300,126 @@ app.delete('/api/productos/:id', verificarToken, (req, res) => {
     } catch (error) {
         console.error('Error al eliminar producto:', error);
         res.status(500).json({ error: 'Error al eliminar producto: ' + error.message });
+    }
+});
+
+// ========================================
+// RUTA PARA ENVIAR PEDIDOS - NO PROTEGIDA
+// ========================================
+
+app.post('/api/enviar-pedido', async (req, res) => {
+    try {
+        const { cliente, productos, total, fecha } = req.body;
+
+        // Validación básica
+        if (!cliente || !cliente.email || !cliente.nombre || !productos || productos.length === 0) {
+            return res.status(400).json({ error: 'Datos de pedido incompletos' });
+        }
+
+        const pedido = {
+            id: Date.now(),
+            cliente,
+            productos,
+            total,
+            fecha,
+            estado: 'pendiente'
+        };
+
+        // Guardar pedido en archivo
+        const pedidosPath = path.join(__dirname, 'data', 'pedidos.json');
+        let pedidos = [];
+        
+        if (fs.existsSync(pedidosPath)) {
+            try {
+                const data = fs.readFileSync(pedidosPath, 'utf-8');
+                pedidos = JSON.parse(data);
+            } catch (e) {
+                pedidos = [];
+            }
+        }
+        
+        pedidos.push(pedido);
+        fs.writeFileSync(pedidosPath, JSON.stringify(pedidos, null, 2));
+
+        console.log('[PEDIDO] Nuevo pedido recibido:', pedido.id);
+
+        // Intentar enviar email (opcional, requiere configuración SMTP)
+        if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+            try {
+                const transporter = nodemailer.createTransport({
+                    host: process.env.SMTP_HOST,
+                    port: process.env.SMTP_PORT || 587,
+                    secure: process.env.SMTP_SECURE === 'true',
+                    auth: {
+                        user: process.env.SMTP_USER,
+                        pass: process.env.SMTP_PASS
+                    }
+                });
+
+                const productosHTML = productos.map(p => 
+                    `<tr>
+                        <td>${p.name}</td>
+                        <td>₡${p.price.toLocaleString()}</td>
+                        <td>${p.quantity}</td>
+                        <td>₡${(p.price * p.quantity).toLocaleString()}</td>
+                    </tr>`
+                ).join('');
+
+                const mailOptions = {
+                    from: process.env.SMTP_FROM || process.env.SMTP_USER,
+                    to: 'ventas@mbsolutionscr.com',
+                    subject: `Nuevo Pedido #${pedido.id} - ${cliente.nombre}`,
+                    html: `
+                        <h2>Nuevo Pedido Recibido</h2>
+                        <p><strong>ID Pedido:</strong> ${pedido.id}</p>
+                        <p><strong>Fecha:</strong> ${new Date(fecha).toLocaleString('es-CR')}</p>
+                        
+                        <h3>Información del Cliente</h3>
+                        <ul>
+                            <li><strong>Nombre:</strong> ${cliente.nombre}</li>
+                            <li><strong>Email:</strong> ${cliente.email}</li>
+                            <li><strong>Teléfono:</strong> ${cliente.telefono || 'No proporcionado'}</li>
+                            <li><strong>Dirección:</strong> ${cliente.direccion}</li>
+                        </ul>
+                        
+                        <h3>Productos</h3>
+                        <table border="1" cellpadding="10" style="border-collapse: collapse; width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${productosHTML}
+                            </tbody>
+                        </table>
+                        
+                        <h3>Total del Pedido: ₡${total.toLocaleString()}</h3>
+                        
+                        ${cliente.notas ? `<h3>Notas Especiales</h3><p>${cliente.notas}</p>` : ''}
+                    `
+                };
+
+                await transporter.sendMail(mailOptions);
+                console.log('[EMAIL] Correo enviado a ventas@mbsolutionscr.com');
+            } catch (emailError) {
+                console.error('[EMAIL] Error al enviar email:', emailError.message);
+                // No fallar la respuesta aunque el email falle
+            }
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Pedido recibido correctamente',
+            pedidoId: pedido.id
+        });
+
+    } catch (error) {
+        console.error('[PEDIDO] Error al procesar pedido:', error);
+        res.status(500).json({ error: 'Error al procesar pedido: ' + error.message });
     }
 });
 

@@ -127,6 +127,26 @@ function contactProduct() {
     window.open(url, '_blank');
 }
 
+function addProductToCart() {
+    if (!selectedProduct) return;
+    if (selectedProduct.stock <= 0) {
+        alert('Producto agotado');
+        return;
+    }
+    
+    // Usar la función del archivo cart.js
+    addToCart({
+        id: selectedProduct.id,
+        code: selectedProduct.code,
+        name: selectedProduct.name,
+        price: selectedProduct.price,
+        image: selectedProduct.image,
+        stock: selectedProduct.stock
+    });
+    
+    closeProductModal();
+}
+
 // Cerrar modal al hacer clic fuera de él
 window.onclick = function(event) {
     const modal = document.getElementById('productModal');
