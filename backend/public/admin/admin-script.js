@@ -8,6 +8,15 @@ let currentEditingId = null;
 let currentImageBase64 = "";
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Verificar que hay un token al cargar la página
+    const token = getAuthToken();
+    if (!token) {
+        console.error('[AUTH] No hay token al cargar la página. Redirigiendo al login...');
+        window.location.href = '/login';
+        return;
+    }
+    
+    console.log('[AUTH] Token encontrado al cargar página');
     loadProductsList();
 });
 
@@ -17,11 +26,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function getAuthToken() {
     // Busca adminToken (principal) o authToken (legacy) para compatibilidad
-    return localStorage.getItem('adminToken') || localStorage.getItem('authToken');
+    const token = localStorage.getItem('adminToken') || localStorage.getItem('authToken');
+    
+    // Verificar que el token existe y no es null/undefined
+    if (!token || token === 'null' || token === 'undefined') {
+        console.error('[AUTH] ❌ No hay token disponible en localStorage');
+        console.log('[AUTH] adminToken:', localStorage.getItem('adminToken'));
+        console.log('[AUTH] authToken:', localStorage.getItem('authToken'));
+        // Redirigir al login si no hay token
+        alert('Sesión expirada. Por favor, inicia sesión nuevamente.');
+        window.location.href = '/login';
+        return null;
+    }
+    
+    return token;
 }
 
 function getAuthHeaders() {
     const token = getAuthToken();
+    
+    if (!token) {
+        // Si no hay token, getAuthToken ya redirigió al login
+        return {};
+    }
+    
     return {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
@@ -187,6 +215,15 @@ async function saveProduct(e) {
         const result = await response.json();
 
         if (!response.ok) {
+            // Si el error es de autenticación, redirigir al login
+            if (response.status === 401) {
+                console.error('[AUTH] Token inválido o expirado. Redirigiendo al login...');
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('authToken');
+                alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
+                window.location.href = '/login';
+                return;
+            }
             throw new Error(result.error || 'Error al guardar producto');
         }
 
