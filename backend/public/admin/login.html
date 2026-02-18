@@ -275,7 +275,7 @@
                 if (response.ok && data.success && data.token) {
                     // Autenticación exitosa
                     // Guardar token en localStorage
-                    localStorage.setItem('authToken', data.token);
+                    localStorage.setItem('adminToken', data.token);
                     localStorage.setItem('usuario', username);
                     
                     // Redirigir al panel admin después de 500ms
@@ -313,7 +313,7 @@
 
         // Verificar si ya está logueado
         window.addEventListener('load', () => {
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem('adminToken');
             if (token) {
                 // Validar que el token sea válido antes de redirigir
                 window.location.href = '/admin';

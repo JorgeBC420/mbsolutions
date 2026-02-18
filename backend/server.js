@@ -7,6 +7,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import { verificarToken } from './middleware/auth.js';
 
 dotenv.config();
 
@@ -16,9 +17,18 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DB_PATH = process.env.DB_PATH || path.join(__dirname, 'data', 'productos.json');
-const JWT_SECRET = process.env.JWT_SECRET || 'secret_key';
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'password';
+const JWT_SECRET = process.env.JWT_SECRET;
+const ADMIN_USER = process.env.ADMIN_USER;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+
+// Validar que las variables críticas estén definidas
+if (!JWT_SECRET || !ADMIN_USER || !ADMIN_PASSWORD) {
+    console.error('[ERROR] Variables de entorno críticas no definidas. Por favor, configura .env con:');
+    console.error('  - JWT_SECRET');
+    console.error('  - ADMIN_USER');
+    console.error('  - ADMIN_PASSWORD');
+    process.exit(1);
+}
 
 // Middleware
 app.use(cors());
@@ -66,21 +76,6 @@ function guardarProductos(productos) {
 
 function generarToken(usuario) {
     return jwt.sign({ usuario }, JWT_SECRET, { expiresIn: '24h' });
-}
-
-function verificarToken(req, res, next) {
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-        return res.status(401).json({ error: 'Token no proporcionado' });
-    }
-
-    try {
-        jwt.verify(token, JWT_SECRET);
-        next();
-    } catch (error) {
-        res.status(401).json({ error: 'Token inválido' });
-    }
 }
 
 function guardarImagen(base64Str) {

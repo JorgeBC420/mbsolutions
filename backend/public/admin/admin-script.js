@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // ========================================
 
 function getAuthToken() {
-    return localStorage.getItem('adminToken');
+    // Busca adminToken (principal) o authToken (legacy) para compatibilidad
+    return localStorage.getItem('adminToken') || localStorage.getItem('authToken');
 }
 
 function getAuthHeaders() {
