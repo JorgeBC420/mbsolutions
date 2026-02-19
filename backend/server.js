@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
-import bcryptjs from 'bcryptjs';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -35,9 +34,16 @@ app.use(cors());
 app.use(express.json({ limit: '50mb' })); // Aumentar límite para imágenes Base64
 // Servir archivos estáticos (ruta absoluta para producción)
 const publicPath = path.join(__dirname__, 'public');
-console.log('[INIT] Buscando carpeta public/ en:', publicPath);
+const adminPath = path.join(__dirname__, 'admin'); // Estructura: backend/admin/
+const adminAdminPath = path.join(__dirname__, 'admin', 'admin'); // Estructura anidada: backend/admin/admin/
+
+console.log('[INIT] Buscando carpetas...');
+console.log('[INIT] public/ en:', publicPath);
+console.log('[INIT] admin/ en:', adminPath);
+console.log('[INIT] admin/admin/ en:', adminAdminPath);
 console.log('[INIT] __dirname__:', __dirname__);
 
+// Servir carpeta public/ si existe (para imágenes y otros estáticos)
 if (fs.existsSync(publicPath)) {
     console.log('[INIT] ✅ Carpeta public/ encontrada:', publicPath);
     app.use(express.static(publicPath));
@@ -48,34 +54,31 @@ if (fs.existsSync(publicPath)) {
         console.log('[INIT] Contenido de public/:', publicContents.map(item => 
             `${item.isDirectory() ? '[DIR]' : '[FILE]'} ${item.name}`
         ).join(', '));
-        
-        const adminPath = path.join(publicPath, 'admin');
-        if (fs.existsSync(adminPath)) {
-            const adminContents = fs.readdirSync(adminPath);
-            console.log('[INIT] Contenido de public/admin/:', adminContents.join(', '));
-        } else {
-            console.warn('[INIT] ⚠️ Carpeta public/admin/ no existe');
-        }
     } catch (error) {
         console.warn('[INIT] Error al leer contenido de public/:', error.message);
     }
 } else {
     console.warn('[INIT] ⚠️ Carpeta public/ no encontrada:', publicPath);
-    console.warn('[INIT] Intentando rutas alternativas...');
+}
+
+// Servir carpeta admin/ directamente (estructura preferida)
+if (fs.existsSync(adminPath)) {
+    console.log('[INIT] ✅ Carpeta admin/ encontrada:', adminPath);
+    app.use('/admin', express.static(adminPath));
     
-    // Intentar rutas alternativas
-    const altPaths = [
-        path.join(__dirname__, '..', 'public'),
-        path.join(__dirname__, 'public_html'),
-    ];
-    
-    for (const altPath of altPaths) {
-        if (fs.existsSync(altPath)) {
-            console.log('[INIT] ✅ Usando ruta alternativa:', altPath);
-            app.use(express.static(altPath));
-            break;
-        }
+    // Listar contenido para debug
+    try {
+        const adminContents = fs.readdirSync(adminPath);
+        console.log('[INIT] Contenido de admin/:', adminContents.join(', '));
+    } catch (error) {
+        console.warn('[INIT] Error al leer contenido de admin/:', error.message);
     }
+} else if (fs.existsSync(adminAdminPath)) {
+    // Fallback: servir carpeta admin/admin/ si existe (estructura anidada)
+    console.log('[INIT] ✅ Carpeta admin/admin/ encontrada (fallback):', adminAdminPath);
+    app.use('/admin', express.static(adminAdminPath));
+} else {
+    console.warn('[INIT] ⚠️ Carpeta admin/ no encontrada');
 }
 
 // Crear carpeta data si no existe
@@ -244,16 +247,38 @@ app.post('/api/login', async (req, res) => {
 app.get('/api/productos', (req, res) => {
     try {
         const productos = leerProductos();
-        res.json(productos);
+        
+        if (!Array.isArray(productos)) {
+            console.warn('[WARN] Productos no es un array, retornando array vacío');
+            return res.json([]);
+        }
+
+        // Filtrar productos con datos válidos (opcional, para robustez)
+        const productosValidos = productos.filter(p => 
+            p && p.id && p.name && p.price !== undefined
+        );
+
+        res.json(productosValidos);
     } catch (error) {
+        console.error('[ERROR] Error al leer productos:', error);
         res.status(500).json({ error: 'Error al leer productos' });
     }
 });
 
 app.get('/api/productos/:id', (req, res) => {
     try {
+        const productId = parseInt(req.params.id);
+        
+        if (isNaN(productId)) {
+            return res.status(400).json({ error: 'ID de producto inválido' });
+        }
+
         const productos = leerProductos();
-        const producto = productos.find(p => p.id === parseInt(req.params.id));
+        if (!Array.isArray(productos)) {
+            return res.status(500).json({ error: 'Error al leer productos' });
+        }
+
+        const producto = productos.find(p => p.id === productId);
         
         if (!producto) {
             return res.status(404).json({ error: 'Producto no encontrado' });
@@ -261,6 +286,7 @@ app.get('/api/productos/:id', (req, res) => {
         
         res.json(producto);
     } catch (error) {
+        console.error('[ERROR] Error al leer producto:', error);
         res.status(500).json({ error: 'Error al leer producto' });
     }
 });
@@ -270,15 +296,38 @@ app.get('/api/productos/:id', (req, res) => {
 // ========================================
 // Permite que las imágenes funcionen aunque el frontend esté en otra ruta o dominio
 app.get('/api/images/:filename', (req, res) => {
-    const filename = req.params.filename;
-    if (!filename || filename.includes('..')) {
-        return res.status(400).send('Nombre de archivo inválido');
+    try {
+        const filename = req.params.filename;
+        
+        // Validación de seguridad: prevenir path traversal
+        if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
+            return res.status(400).json({ error: 'Nombre de archivo inválido' });
+        }
+
+        // Validar extensión de archivo
+        const allowedExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp'];
+        const ext = path.extname(filename).toLowerCase();
+        if (!allowedExtensions.includes(ext)) {
+            return res.status(400).json({ error: 'Tipo de archivo no permitido' });
+        }
+
+        const imagePath = path.join(__dirname__, 'public', 'images', filename);
+        
+        if (!fs.existsSync(imagePath)) {
+            return res.status(404).json({ error: 'Imagen no encontrada' });
+        }
+
+        // Establecer headers apropiados para imágenes
+        res.setHeader('Content-Type', ext === '.png' ? 'image/png' : 
+                                     ext === '.jpg' || ext === '.jpeg' ? 'image/jpeg' :
+                                     ext === '.gif' ? 'image/gif' : 'image/webp');
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache por 1 año
+        
+        res.sendFile(imagePath);
+    } catch (error) {
+        console.error('[ERROR] Error al servir imagen:', error);
+        res.status(500).json({ error: 'Error al cargar imagen' });
     }
-    const imagePath = path.join(__dirname__, 'public', 'images', filename);
-    if (!fs.existsSync(imagePath)) {
-        return res.status(404).send('Imagen no encontrada');
-    }
-    res.sendFile(imagePath);
 });
 
 // ========================================
@@ -289,15 +338,59 @@ app.post('/api/productos', verificarToken, (req, res) => {
     try {
         const { code, name, category, price, stock, description, image } = req.body;
 
-        // Validación mejorada
+        // Validación de campos requeridos
         if (!code || !name || !category || price === undefined || stock === undefined || !description) {
-            return res.status(400).json({ error: 'Faltan campos requeridos' });
+            return res.status(400).json({ 
+                error: 'Faltan campos requeridos',
+                required: ['code', 'name', 'category', 'price', 'stock', 'description']
+            });
         }
 
-        // Leer productos actuales
+        // Validación de tipos y valores
+        const categoriasValidas = ['laptops', 'desktops', 'accesorios', 'componentes'];
+        if (!categoriasValidas.includes(String(category).toLowerCase())) {
+            return res.status(400).json({ 
+                error: 'Categoría inválida',
+                validCategories: categoriasValidas
+            });
+        }
+
+        const priceNum = Number(price);
+        const stockNum = Number(stock);
+
+        if (isNaN(priceNum) || priceNum < 0) {
+            return res.status(400).json({ error: 'El precio debe ser un número positivo' });
+        }
+
+        if (isNaN(stockNum) || stockNum < 0 || !Number.isInteger(stockNum)) {
+            return res.status(400).json({ error: 'El stock debe ser un número entero positivo' });
+        }
+
+        // Validación de longitud de campos
+        if (String(code).trim().length === 0 || String(code).length > 50) {
+            return res.status(400).json({ error: 'El código debe tener entre 1 y 50 caracteres' });
+        }
+
+        if (String(name).trim().length === 0 || String(name).length > 200) {
+            return res.status(400).json({ error: 'El nombre debe tener entre 1 y 200 caracteres' });
+        }
+
+        if (String(description).trim().length === 0 || String(description).length > 2000) {
+            return res.status(400).json({ error: 'La descripción debe tener entre 1 y 2000 caracteres' });
+        }
+
+        // Verificar que no exista un producto con el mismo código
         let productos = leerProductos();
         if (!Array.isArray(productos)) {
             productos = [];
+        }
+
+        const codigoExistente = productos.find(p => String(p.code).toLowerCase() === String(code).toLowerCase());
+        if (codigoExistente) {
+            return res.status(409).json({ 
+                error: 'Ya existe un producto con este código',
+                existingProduct: { id: codigoExistente.id, name: codigoExistente.name }
+            });
         }
 
         // Guardar imagen y obtener nombre del archivo
@@ -308,12 +401,12 @@ app.post('/api/productos', verificarToken, (req, res) => {
         // Crear nuevo producto
         const nuevoProducto = {
             id: Date.now(),
-            code: String(code),
-            name: String(name),
-            category: String(category),
-            price: parseInt(price) || 0,
-            stock: parseInt(stock) || 0,
-            description: String(description),
+            code: String(code).trim(),
+            name: String(name).trim(),
+            category: String(category).toLowerCase(),
+            price: Math.round(priceNum * 100) / 100, // Redondear a 2 decimales
+            stock: Math.floor(stockNum),
+            description: String(description).trim(),
             image: nombreImagen,
             createdAt: new Date().toISOString()
         };
@@ -328,7 +421,7 @@ app.post('/api/productos', verificarToken, (req, res) => {
             product: nuevoProducto
         });
     } catch (error) {
-        console.error('Error al crear producto:', error);
+        console.error('[ERROR] Error al crear producto:', error);
         res.status(500).json({ error: 'Error al crear producto: ' + error.message });
     }
 });
@@ -336,24 +429,87 @@ app.post('/api/productos', verificarToken, (req, res) => {
 app.put('/api/productos/:id', verificarToken, (req, res) => {
     try {
         const { code, name, category, price, stock, description, image } = req.body;
-        let productos = leerProductos();
-        const index = productos.findIndex(p => p.id === parseInt(req.params.id));
+        const productId = parseInt(req.params.id);
 
+        if (isNaN(productId)) {
+            return res.status(400).json({ error: 'ID de producto inválido' });
+        }
+
+        let productos = leerProductos();
+        if (!Array.isArray(productos)) {
+            productos = [];
+        }
+
+        const index = productos.findIndex(p => p.id === productId);
         if (index === -1) {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        // Actualizar solo los campos proporcionados
-        if (code !== undefined) productos[index].code = String(code);
-        if (name !== undefined) productos[index].name = String(name);
-        if (category !== undefined) productos[index].category = String(category);
-        if (price !== undefined) productos[index].price = parseInt(price) || 0;
-        if (stock !== undefined) productos[index].stock = parseInt(stock) || 0;
-        if (description !== undefined) productos[index].description = String(description);
+        // Validaciones para campos actualizados
+        if (category !== undefined) {
+            const categoriasValidas = ['laptops', 'desktops', 'accesorios', 'componentes'];
+            if (!categoriasValidas.includes(String(category).toLowerCase())) {
+                return res.status(400).json({ 
+                    error: 'Categoría inválida',
+                    validCategories: categoriasValidas
+                });
+            }
+            productos[index].category = String(category).toLowerCase();
+        }
+
+        if (code !== undefined) {
+            const codeStr = String(code).trim();
+            if (codeStr.length === 0 || codeStr.length > 50) {
+                return res.status(400).json({ error: 'El código debe tener entre 1 y 50 caracteres' });
+            }
+            // Verificar que no exista otro producto con el mismo código
+            const codigoExistente = productos.find((p, i) => i !== index && String(p.code).toLowerCase() === codeStr.toLowerCase());
+            if (codigoExistente) {
+                return res.status(409).json({ 
+                    error: 'Ya existe otro producto con este código',
+                    existingProduct: { id: codigoExistente.id, name: codigoExistente.name }
+                });
+            }
+            productos[index].code = codeStr;
+        }
+
+        if (name !== undefined) {
+            const nameStr = String(name).trim();
+            if (nameStr.length === 0 || nameStr.length > 200) {
+                return res.status(400).json({ error: 'El nombre debe tener entre 1 y 200 caracteres' });
+            }
+            productos[index].name = nameStr;
+        }
+
+        if (price !== undefined) {
+            const priceNum = Number(price);
+            if (isNaN(priceNum) || priceNum < 0) {
+                return res.status(400).json({ error: 'El precio debe ser un número positivo' });
+            }
+            productos[index].price = Math.round(priceNum * 100) / 100;
+        }
+
+        if (stock !== undefined) {
+            const stockNum = Number(stock);
+            if (isNaN(stockNum) || stockNum < 0 || !Number.isInteger(stockNum)) {
+                return res.status(400).json({ error: 'El stock debe ser un número entero positivo' });
+            }
+            productos[index].stock = Math.floor(stockNum);
+        }
+
+        if (description !== undefined) {
+            const descStr = String(description).trim();
+            if (descStr.length === 0 || descStr.length > 2000) {
+                return res.status(400).json({ error: 'La descripción debe tener entre 1 y 2000 caracteres' });
+            }
+            productos[index].description = descStr;
+        }
+
         if (image !== undefined) {
             const nombreImagen = guardarImagen(image);
             productos[index].image = nombreImagen;
         }
+
         productos[index].updatedAt = new Date().toISOString();
 
         guardarProductos(productos);
@@ -364,15 +520,25 @@ app.put('/api/productos/:id', verificarToken, (req, res) => {
             product: productos[index]
         });
     } catch (error) {
-        console.error('Error al actualizar producto:', error);
+        console.error('[ERROR] Error al actualizar producto:', error);
         res.status(500).json({ error: 'Error al actualizar producto: ' + error.message });
     }
 });
 
 app.delete('/api/productos/:id', verificarToken, (req, res) => {
     try {
+        const productId = parseInt(req.params.id);
+
+        if (isNaN(productId)) {
+            return res.status(400).json({ error: 'ID de producto inválido' });
+        }
+
         let productos = leerProductos();
-        const index = productos.findIndex(p => p.id === parseInt(req.params.id));
+        if (!Array.isArray(productos)) {
+            productos = [];
+        }
+
+        const index = productos.findIndex(p => p.id === productId);
 
         if (index === -1) {
             return res.status(404).json({ error: 'Producto no encontrado' });
@@ -382,13 +548,15 @@ app.delete('/api/productos/:id', verificarToken, (req, res) => {
         productos.splice(index, 1);
         guardarProductos(productos);
 
+        console.log('[DB] Producto eliminado:', productoEliminado.id, productoEliminado.name);
+
         res.json({
             success: true,
             message: 'Producto eliminado exitosamente',
             product: productoEliminado
         });
     } catch (error) {
-        console.error('Error al eliminar producto:', error);
+        console.error('[ERROR] Error al eliminar producto:', error);
         res.status(500).json({ error: 'Error al eliminar producto: ' + error.message });
     }
 });
@@ -403,7 +571,43 @@ app.post('/api/enviar-pedido', async (req, res) => {
 
         // Validación básica
         if (!cliente || !cliente.email || !cliente.nombre || !productos || productos.length === 0) {
-            return res.status(400).json({ error: 'Datos de pedido incompletos' });
+            return res.status(400).json({ 
+                error: 'Datos de pedido incompletos',
+                required: {
+                    cliente: ['nombre', 'email'],
+                    productos: 'array no vacío',
+                    total: 'number',
+                    fecha: 'string'
+                }
+            });
+        }
+
+        // Validación de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(cliente.email)) {
+            return res.status(400).json({ error: 'Email inválido' });
+        }
+
+        // Validación de total
+        const totalNum = Number(total);
+        if (isNaN(totalNum) || totalNum < 0) {
+            return res.status(400).json({ error: 'Total inválido' });
+        }
+
+        // Validación de productos
+        if (!Array.isArray(productos)) {
+            return res.status(400).json({ error: 'Los productos deben ser un array' });
+        }
+
+        for (const producto of productos) {
+            if (!producto.id || !producto.name || producto.price === undefined || producto.quantity === undefined) {
+                return res.status(400).json({ 
+                    error: 'Cada producto debe tener: id, name, price, quantity' 
+                });
+            }
+            if (Number(producto.quantity) <= 0) {
+                return res.status(400).json({ error: 'La cantidad debe ser mayor a 0' });
+            }
         }
 
         const pedido = {
@@ -518,61 +722,53 @@ app.post('/api/enviar-pedido', async (req, res) => {
 // ========================================
 
 app.get('/login', (req, res) => {
-    const loginPath = path.join(__dirname__, 'public', 'admin', 'login.html');
-    console.log('[ROUTE] /login - Buscando archivo en:', loginPath);
-    console.log('[ROUTE] __dirname__:', __dirname__);
-    console.log('[ROUTE] Archivo existe:', fs.existsSync(loginPath));
+    // Intentar múltiples estructuras posibles (orden de prioridad)
+    const possiblePaths = [
+        path.join(__dirname__, 'admin', 'login.html'), // Estructura directa: backend/admin/ (PREFERIDA)
+        path.join(__dirname__, 'admin', 'admin', 'login.html'), // Estructura anidada: backend/admin/admin/
+        path.join(__dirname__, 'public', 'admin', 'login.html'), // Estructura antigua: backend/public/admin/
+    ];
     
-    if (fs.existsSync(loginPath)) {
-        res.sendFile(loginPath);
-    } else {
-        console.error('[ROUTE] ❌ Archivo no encontrado:', loginPath);
-        // Intentar rutas alternativas
-        const altPaths = [
-            path.join(__dirname__, '..', 'public', 'admin', 'login.html'),
-            path.join(__dirname__, 'public', 'login.html'),
-        ];
-        for (const altPath of altPaths) {
-            if (fs.existsSync(altPath)) {
-                console.log('[ROUTE] ✅ Encontrado en ruta alternativa:', altPath);
-                return res.sendFile(altPath);
-            }
+    console.log('[ROUTE] /login - Buscando archivo...');
+    
+    for (const loginPath of possiblePaths) {
+        if (fs.existsSync(loginPath)) {
+            console.log('[ROUTE] ✅ Encontrado en:', loginPath);
+            return res.sendFile(loginPath);
         }
-        res.status(404).json({ 
-            error: 'Página de login no encontrada',
-            searchedPath: loginPath,
-            __dirname: __dirname__
-        });
     }
+    
+    console.error('[ROUTE] ❌ Archivo no encontrado en ninguna ruta');
+    res.status(404).json({ 
+        error: 'Página de login no encontrada',
+        searchedPaths: possiblePaths,
+        __dirname: __dirname__
+    });
 });
 
 app.get('/admin', (req, res) => {
-    const adminPath = path.join(__dirname__, 'public', 'admin', 'admin.html');
-    console.log('[ROUTE] /admin - Buscando archivo en:', adminPath);
-    console.log('[ROUTE] __dirname__:', __dirname__);
-    console.log('[ROUTE] Archivo existe:', fs.existsSync(adminPath));
+    // Intentar múltiples estructuras posibles (orden de prioridad)
+    const possiblePaths = [
+        path.join(__dirname__, 'admin', 'admin.html'), // Estructura directa: backend/admin/ (PREFERIDA)
+        path.join(__dirname__, 'admin', 'admin', 'admin.html'), // Estructura anidada: backend/admin/admin/
+        path.join(__dirname__, 'public', 'admin', 'admin.html'), // Estructura antigua: backend/public/admin/
+    ];
     
-    if (fs.existsSync(adminPath)) {
-        res.sendFile(adminPath);
-    } else {
-        console.error('[ROUTE] ❌ Archivo no encontrado:', adminPath);
-        // Intentar rutas alternativas
-        const altPaths = [
-            path.join(__dirname__, '..', 'public', 'admin', 'admin.html'),
-            path.join(__dirname__, 'public', 'admin.html'),
-        ];
-        for (const altPath of altPaths) {
-            if (fs.existsSync(altPath)) {
-                console.log('[ROUTE] ✅ Encontrado en ruta alternativa:', altPath);
-                return res.sendFile(altPath);
-            }
+    console.log('[ROUTE] /admin - Buscando archivo...');
+    
+    for (const adminPath of possiblePaths) {
+        if (fs.existsSync(adminPath)) {
+            console.log('[ROUTE] ✅ Encontrado en:', adminPath);
+            return res.sendFile(adminPath);
         }
-        res.status(404).json({ 
-            error: 'Panel de administración no encontrado',
-            searchedPath: adminPath,
-            __dirname: __dirname__
-        });
     }
+    
+    console.error('[ROUTE] ❌ Archivo no encontrado en ninguna ruta');
+    res.status(404).json({ 
+        error: 'Panel de administración no encontrado',
+        searchedPaths: possiblePaths,
+        __dirname: __dirname__
+    });
 });
 
 // ========================================

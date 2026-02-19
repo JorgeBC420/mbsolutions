@@ -9,8 +9,8 @@ import { spawn } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __filename__ = fileURLToPath(import.meta.url);
+const __dirname__ = path.dirname(__filename__);
 
 console.log('╔════════════════════════════════════════════════════════════╗');
 console.log('║          MB Solutions - Backend Server                    ║');
@@ -19,7 +19,7 @@ console.log('╚═════════════════════�
 
 // Iniciar el servidor
 const server = spawn('node', ['server.js'], {
-    cwd: __dirname,
+    cwd: __dirname__,
     stdio: 'inherit'
 });
 

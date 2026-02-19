@@ -30,3 +30,16 @@ backend/public/images/*
 # Archivos temporales
 *.tmp
 .cache/
+
+# Documentación con datos sensibles (credenciales, usuarios, contraseñas)
+DEPLOYMENT_BANAHOSTING.md
+CHEAT_SHEET.md
+README_IMPLEMENTATION.md
+API_GUIDE.md
+COMPLETION_SUMMARY.md
+DETAILED_CHANGELOG.md
+MIGRATION_SUMMARY.md
+QUICK_START.md
+
+# Scripts con credenciales
+backend/start.ps1
