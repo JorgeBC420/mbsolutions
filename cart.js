@@ -40,7 +40,7 @@ function addToCart(product) {
     
     saveCart(cart);
     console.log('[CART] Producto agregado:', product.name);
-    alert(`${product.name} agregado al carrito`);
+    alert(`₡{product.name} agregado al carrito`);
 }
 
 // Eliminar producto del carrito
@@ -108,36 +108,52 @@ function displayCart() {
     if (!cartTableBody) return;
     
     cartTableBody.innerHTML = '';
-    let total = 0;
-    
+
     cart.forEach(item => {
-        const subtotal = item.price * item.quantity;
-        total += subtotal;
-        
+        const precioUnitario = Number(item.price) || 0;
+        const subtotalFila = precioUnitario * item.quantity;
+
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${item.name}</td>
-            <td>$${item.price.toFixed(2)}</td>
+            <td>₡{item.name}</td>
+            <td>₡${precioUnitario.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td>
-                <input type="number" min="1" value="${item.quantity}" 
-                       onchange="updateQuantity(${item.id}, this.value)">
+                <input type="number" min="1" value="₡{item.quantity}" 
+                       onchange="updateQuantity(₡{item.id}, parseInt(this.value, 10)); location.reload();">
             </td>
-            <td>$${subtotal.toFixed(2)}</td>
+            <td>₡${subtotalFila.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td>
-                <button onclick="removeFromCart(${item.id})" class="btn-remove">
+                <button onclick="removeFromCart(₡{item.id}); location.reload();" class="btn-remove">
                     Eliminar
                 </button>
             </td>
         `;
         cartTableBody.appendChild(row);
     });
+}
+// Actualizar resumen extrayendo el IVA del precio total
+function actualizarResumen() {
+    const precioTotalConIVA = getCartTotal(); // total final con IVA
     
-    // Actualizar total
-    const totalElement = document.querySelector('#cartTotal');
-    if (totalElement) {
-        totalElement.textContent = `$${total.toFixed(2)}`;
+    // Cálculo inverso: extraer el 13% de IVA
+    const subtotalSinIVA = precioTotalConIVA / 1.13;
+    const impuestoIVA = precioTotalConIVA - subtotalSinIVA;
+    
+    const formatoCR = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+
+    const subtotalEl = document.getElementById('cartSubtotal');
+    const taxEl = document.getElementById('cartTax');
+    const totalEl = document.getElementById('cartTotal');
+
+    if (subtotalEl) {
+        subtotalEl.textContent = `₡${subtotalSinIVA.toLocaleString('es-CR', formatoCR)}`;
+    }
+    if (taxEl) {
+        taxEl.textContent = `₡${impuestoIVA.toLocaleString('es-CR', formatoCR)}`;
+    }
+    if (totalEl) {
+        totalEl.textContent = `₡${precioTotalConIVA.toLocaleString('es-CR', formatoCR)}`;
     }
 }
-
 // Inicializar contador de carrito al cargar
 window.addEventListener('load', updateCartCount);

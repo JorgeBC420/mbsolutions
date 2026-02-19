@@ -53,7 +53,8 @@ function loadCategoryFilters() {
         'laptops': 'Laptops',
         'desktops': 'Computadoras',
         'accesorios': 'Accesorios',
-        'componentes': 'Componentes'
+        'componentes': 'Componentes',
+        'consumibles': 'Consumibles'
     };
     const filterDiv = document.getElementById('categoryFilter');
     if (!filterDiv) return;

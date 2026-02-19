@@ -202,15 +202,15 @@
             <div class="carrito-resumen">
                 <div class="resumen-item">
                     <span>Subtotal:</span>
-                    <span id="cartSubtotal">$0.00</span>
+                    <span id="cartSubtotal">₡0.00</span>
                 </div>
                 <div class="resumen-item">
                     <span>Impuesto:</span>
-                    <span id="cartTax">$0.00</span>
+                    <span id="cartTax">₡0.00</span>
                 </div>
                 <div class="resumen-total">
                     <span>Total: </span>
-                    <span id="cartTotal">$0.00</span>
+                    <span id="cartTotal">₡0.00</span>
                 </div>
             </div>
             
@@ -279,17 +279,6 @@
             }
         }
         
-        // Actualizar resumen
-        function actualizarResumen() {
-            const total = getCartTotal();
-            const tax = total * 0.13; // 13% IVA Costa Rica
-            const totalConImpuesto = total + tax;
-            
-            document.getElementById('cartSubtotal').textContent = `$${total.toFixed(2)}`;
-            document.getElementById('cartTax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('cartTotal').textContent = `$${totalConImpuesto.toFixed(2)}`;
-        }
-        
         // Mostrar formulario de pedido
         function mostrarFormularioPedido() {
             document.getElementById('formularioPedido').style.display = 'block';
@@ -325,7 +314,7 @@
             };
             
             try {
-                const response = await fetch(`${API_BASE}/api/enviar-pedido`, {
+                const response = await fetch(`₡{API_BASE}/api/enviar-pedido`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

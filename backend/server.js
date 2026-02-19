@@ -346,17 +346,17 @@ app.post('/api/productos', verificarToken, (req, res) => {
             });
         }
 
-        // Validación de tipos y valores
-        const categoriasValidas = ['laptops', 'desktops', 'accesorios', 'componentes'];
-        if (!categoriasValidas.includes(String(category).toLowerCase())) {
-            return res.status(400).json({ 
-                error: 'Categoría inválida',
-                validCategories: categoriasValidas
-            });
-        }
+// Validación de tipos y valores
+const categoriasValidas = ['laptops', 'desktops', 'accesorios', 'componentes', 'consumibles'];
+if (!categoriasValidas.includes(String(category).toLowerCase())) {
+    return res.status(400).json({ 
+        error: 'Categoría inválida',
+        validCategories: categoriasValidas
+    });
+}
 
-        const priceNum = Number(price);
-        const stockNum = Number(stock);
+const priceNum = Number(price);
+const stockNum = Number(stock);
 
         if (isNaN(priceNum) || priceNum < 0) {
             return res.status(400).json({ error: 'El precio debe ser un número positivo' });
@@ -445,17 +445,17 @@ app.put('/api/productos/:id', verificarToken, (req, res) => {
             return res.status(404).json({ error: 'Producto no encontrado' });
         }
 
-        // Validaciones para campos actualizados
-        if (category !== undefined) {
-            const categoriasValidas = ['laptops', 'desktops', 'accesorios', 'componentes'];
-            if (!categoriasValidas.includes(String(category).toLowerCase())) {
-                return res.status(400).json({ 
-                    error: 'Categoría inválida',
-                    validCategories: categoriasValidas
-                });
-            }
-            productos[index].category = String(category).toLowerCase();
-        }
+// Validaciones para campos actualizados
+if (category !== undefined) {
+    const categoriasValidas = ['laptops', 'desktops', 'accesorios', 'componentes', 'consumibles'];
+    if (!categoriasValidas.includes(String(category).toLowerCase())) {
+        return res.status(400).json({ 
+            error: 'Categoría inválida',
+            validCategories: categoriasValidas
+        });
+    }
+    productos[index].category = String(category).toLowerCase();
+}
 
         if (code !== undefined) {
             const codeStr = String(code).trim();
