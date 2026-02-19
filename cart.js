@@ -40,7 +40,7 @@ function addToCart(product) {
     
     saveCart(cart);
     console.log('[CART] Producto agregado:', product.name);
-    alert(`₡{product.name} agregado al carrito`);
+    alert(`${product.name} agregado al carrito`);
 }
 
 // Eliminar producto del carrito
@@ -115,15 +115,15 @@ function displayCart() {
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>₡{item.name}</td>
+            <td>${item.name}</td>
             <td>₡${precioUnitario.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td>
-                <input type="number" min="1" value="₡{item.quantity}" 
-                       onchange="updateQuantity(₡{item.id}, parseInt(this.value, 10)); location.reload();">
+                <input type="number" min="1" value="${item.quantity}" 
+                       onchange="updateQuantity(${item.id}, parseInt(this.value, 10)); location.reload();">
             </td>
             <td>₡${subtotalFila.toLocaleString('es-CR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
             <td>
-                <button onclick="removeFromCart(₡{item.id}); location.reload();" class="btn-remove">
+                <button onclick="removeFromCart(${item.id}); location.reload();" class="btn-remove">
                     Eliminar
                 </button>
             </td>
