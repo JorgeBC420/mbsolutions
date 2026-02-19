@@ -6,6 +6,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import nodemailer from 'nodemailer';
+import sharp from 'sharp';
 import { verificarToken } from './middleware/auth.js';
 
 dotenv.config();
@@ -130,7 +131,7 @@ function generarToken(usuario) {
     return jwt.sign({ usuario }, JWT_SECRET, { expiresIn: '24h' });
 }
 
-function guardarImagen(base64Str) {
+async function guardarImagen(base64Str) {
     try {
         // Si no hay imagen, retornar placeholder
         if (!base64Str || base64Str === 'images/placeholder.jpg' || base64Str === '') {
@@ -139,9 +140,9 @@ function guardarImagen(base64Str) {
 
         console.log('[IMG] Iniciando guardado de imagen...');
         
-        // Generar nombre único para el archivo
+        // Generar nombre único para el archivo (ahora en WebP)
         const timestamp = Date.now();
-        const filename = `producto_${timestamp}.png`;
+        const filename = `producto_${timestamp}.webp`;
         // Siempre guardar en public/images para que express.static('public') sirva en /images/
         const imagesPath = path.join(__dirname__, 'public', 'images');
         const filepath = path.join(imagesPath, filename);
@@ -155,8 +156,8 @@ function guardarImagen(base64Str) {
             fs.mkdirSync(imagesPath, { recursive: true });
         }
         
-        // Decodificar Base64 (manejo de data URI format)
-        let base64Data = base64Str.replace(/^data:image\/(png|jpg|jpeg|gif);base64,/, '');
+        // Decodificar Base64 (manejo de data URI format - acepta webp también)
+        let base64Data = base64Str.replace(/^data:image\/(png|jpg|jpeg|gif|webp);base64,/, '');
         
         // Validar que tengan datos Base64
         if (!base64Data || base64Data.length < 10) {
@@ -164,24 +165,54 @@ function guardarImagen(base64Str) {
             return 'images/placeholder.jpg';
         }
         
-        // Intentar decodificar para validar
-        const buffer = Buffer.from(base64Data, 'base64');
-        if (buffer.length < 10) {
+        // Decodificar buffer desde Base64
+        const inputBuffer = Buffer.from(base64Data, 'base64');
+        if (inputBuffer.length < 10) {
             console.warn('[IMG] Buffer decodificado muy pequeño, usando placeholder');
             return 'images/placeholder.jpg';
         }
         
-        console.log('[IMG] Buffer size:', buffer.length, 'bytes');
+        console.log('[IMG] Buffer size original:', inputBuffer.length, 'bytes');
         
-        // Guardar archivo
-        fs.writeFileSync(filepath, buffer);
+        // Convertir a WebP con calidad 85% (balance entre calidad y tamaño)
+        // Redimensionar si es muy grande (máximo 1920px de ancho)
+        const webpBuffer = await sharp(inputBuffer)
+            .resize(1920, null, { 
+                withoutEnlargement: true,  // No agrandar si es más pequeña
+                fit: 'inside'              // Mantener proporción
+            })
+            .webp({ 
+                quality: 85,               // Calidad 85% (buena calidad, buen tamaño)
+                effort: 4                  // Velocidad de compresión (0-6, 4 es balance)
+            })
+            .toBuffer();
         
-        console.log('[IMG] Imagen guardada exitosamente:', filename);
+        console.log('[IMG] Buffer size WebP:', webpBuffer.length, 'bytes');
+        console.log('[IMG] Reducción:', Math.round((1 - webpBuffer.length / inputBuffer.length) * 100) + '%');
+        
+        // Guardar archivo WebP
+        fs.writeFileSync(filepath, webpBuffer);
+        
+        console.log('[IMG] Imagen guardada exitosamente como WebP:', filename);
         return `images/${filename}`;
     } catch (error) {
         console.error('[IMG] Error crítico al guardar imagen:', error.message);
         console.error('[IMG] Stack:', error.stack);
-        return 'images/placeholder.jpg';
+        // Si falla la conversión a WebP, intentar guardar el original como fallback
+        try {
+            const timestamp = Date.now();
+            const fallbackFilename = `producto_${timestamp}_fallback.png`;
+            const imagesPath = path.join(__dirname__, 'public', 'images');
+            const filepath = path.join(imagesPath, fallbackFilename);
+            let base64Data = base64Str.replace(/^data:image\/(png|jpg|jpeg|gif|webp);base64,/, '');
+            const buffer = Buffer.from(base64Data, 'base64');
+            fs.writeFileSync(filepath, buffer);
+            console.log('[IMG] Guardado como fallback PNG:', fallbackFilename);
+            return `images/${fallbackFilename}`;
+        } catch (fallbackError) {
+            console.error('[IMG] Fallback también falló:', fallbackError.message);
+            return 'images/placeholder.jpg';
+        }
     }
 }
 
@@ -334,7 +365,7 @@ app.get('/api/images/:filename', (req, res) => {
 // RUTAS DE PRODUCTOS (PROTEGIDAS - ADMIN)
 // ========================================
 
-app.post('/api/productos', verificarToken, (req, res) => {
+app.post('/api/productos', verificarToken, async (req, res) => {
     try {
         const { code, name, category, price, stock, description, image } = req.body;
 
@@ -395,7 +426,7 @@ const stockNum = Number(stock);
 
         // Guardar imagen y obtener nombre del archivo
         console.log('[DB] Guardando producto - Code:', code);
-        const nombreImagen = guardarImagen(image);
+        const nombreImagen = await guardarImagen(image);
         console.log('[DB] Imagen guardada como:', nombreImagen);
 
         // Crear nuevo producto
@@ -426,7 +457,7 @@ const stockNum = Number(stock);
     }
 });
 
-app.put('/api/productos/:id', verificarToken, (req, res) => {
+app.put('/api/productos/:id', verificarToken, async (req, res) => {
     try {
         const { code, name, category, price, stock, description, image } = req.body;
         const productId = parseInt(req.params.id);
@@ -506,7 +537,7 @@ if (category !== undefined) {
         }
 
         if (image !== undefined) {
-            const nombreImagen = guardarImagen(image);
+            const nombreImagen = await guardarImagen(image);
             productos[index].image = nombreImagen;
         }
 

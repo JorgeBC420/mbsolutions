@@ -14,7 +14,14 @@
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: border-box; /* Evita que el padding sume al ancho total */
+}
+
+html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
 }
 
 body {
@@ -22,10 +29,15 @@ body {
     color: var(--dark);
     overflow-x: hidden;
     line-height: 1.6;
+    width: 100%;
+    position: relative;
+    max-width: 100%;
 }
 
-html {
-    scroll-behavior: smooth;
+/* Corrección adicional de desbordamiento horizontal en Android/iOS */
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw; /* Evita que el contenido exceda el viewport */
 }
 
 /* ========================================
