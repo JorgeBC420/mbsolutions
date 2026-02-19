@@ -182,6 +182,8 @@ html, body {
     position: relative;
     z-index: 1;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box; /* Asegura que padding se incluya en el ancho */
 }
 
 .hero-content h1 {
@@ -265,6 +267,7 @@ html, body {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-sizing: border-box; /* Asegura que no cause overflow */
 }
 
 .carousel-wrapper {
@@ -505,6 +508,10 @@ background: #000;
 .contact-section {
     padding: 100px 2rem;
     background: white;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box; /* Asegura que padding se incluya en el ancho */
 }
 
 .contact-grid {
@@ -514,6 +521,9 @@ background: #000;
     max-width: 1200px;
     margin: 0 auto;
     align-items: start;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .contact-info-box {
@@ -1185,6 +1195,22 @@ footer {
 
     .hero {
         padding-top: 60px;
+        overflow-x: hidden; /* Prevenir overflow horizontal en móvil */
+    }
+
+    .hero-container {
+        padding: 2rem 1rem; /* Reducir padding horizontal en móvil */
+        max-width: 100%;
+    }
+
+    .contact-section {
+        padding: 60px 1rem; /* Reducir padding horizontal en móvil */
+        overflow-x: hidden; /* Prevenir overflow horizontal en móvil */
+    }
+
+    .contact-grid {
+        padding: 0;
+        max-width: 100%;
     }
 }
 
@@ -1206,12 +1232,21 @@ footer {
         justify-content: center;
     }
 
+    .hero-container {
+        padding: 1.5rem 1rem; /* Padding aún más reducido en móviles pequeños */
+    }
+
+    .contact-section {
+        padding: 60px 1rem; /* Padding reducido en móviles pequeños */
+    }
+
     .contact-form {
-        padding: 2rem 1.5rem;
+        padding: 2rem 1rem; /* Padding reducido en móviles pequeños */
     }
 
     .carousel-container {
         height: 250px;
+        max-width: 100%;
     }
 
     .carousel-prev,
