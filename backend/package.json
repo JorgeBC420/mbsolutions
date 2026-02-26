@@ -23,6 +23,7 @@
     "jsonwebtoken": "^9.0.0",
     "bcryptjs": "^2.4.3",
     "nodemailer": "^6.9.7",
-    "sharp": "^0.33.0"
+    "sharp": "^0.33.0",
+    "express-rate-limit": "^7.0.0"
   }
 }

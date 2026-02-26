@@ -3,354 +3,629 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Carrito - MB Solutions</title>
+    <title>Mi Carrito - MB Solutions CR</title>
+    <meta name="description" content="Revisa y confirma los productos en tu carrito de compras.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+
     <style>
-        .carrito-container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 20px;
+        /* ===== PÁGINA DE CARRITO ===== */
+        body {
+            background: #0a0a0f;
+            color: #e2e8f0;
         }
-        
-        .carrito-vacio {
+
+        .cart-page {
+            min-height: 100vh;
+            padding-top: 80px;
+        }
+
+        .cart-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        .cart-page-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .cart-page-title i { color: var(--primary, #3b82f6); }
+
+        /* ── Layout ── */
+        .cart-layout {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 2rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .cart-layout { grid-template-columns: 1fr; }
+        }
+
+        /* ── Carrito vacío ── */
+        .cart-empty {
+            grid-column: 1 / -1;
             text-align: center;
-            padding: 60px 20px;
-            background: #f5f5f5;
+            padding: 5rem 2rem;
+            background: #141420;
+            border-radius: 16px;
+            border: 1px dashed #2a2a45;
+        }
+        .cart-empty i {
+            font-size: 4rem;
+            color: #2a2a45;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+        .cart-empty h3 { color: #aaa; font-size: 1.3rem; margin-bottom: 1rem; }
+        .cart-empty p  { color: #555; margin-bottom: 2rem; }
+
+        /* ── Tabla de productos ── */
+        .cart-items-panel {
+            background: #141420;
+            border-radius: 16px;
+            border: 1px solid #1e1e30;
+            overflow: hidden;
+        }
+
+        .cart-items-header {
+            display: grid;
+            grid-template-columns: 1fr 110px 120px 110px 50px;
+            padding: 1rem 1.5rem;
+            background: #0f0f1a;
+            border-bottom: 1px solid #1e1e30;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #555;
+        }
+        @media (max-width: 600px) {
+            .cart-items-header { display: none; }
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 1fr 110px 120px 110px 50px;
+            align-items: center;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid #1a1a28;
+            transition: background 0.2s;
+        }
+        .cart-item:last-child { border-bottom: none; }
+        .cart-item:hover { background: #16162a; }
+
+        @media (max-width: 600px) {
+            .cart-item {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 0.5rem;
+                padding: 1rem;
+            }
+        }
+
+        .cart-item-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .cart-item-img {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
             border-radius: 8px;
-            margin: 20px 0;
+            background: #0f0f1a;
+            padding: 4px;
+            flex-shrink: 0;
         }
-        
-        .carrito-vacio p {
-            font-size: 18px;
-            color: #666;
-            margin: 20px 0;
+        .cart-item-name {
+            font-weight: 600;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
-        
-        #cartTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+        .cart-item-code {
+            font-size: 0.78rem;
+            color: #555;
+            margin-top: 2px;
         }
-        
-        #cartTable thead {
-            background: #333;
-            color: white;
+
+        .cart-item-price {
+            color: #4a9eff;
+            font-weight: 700;
+            font-size: 0.95rem;
         }
-        
-        #cartTable th, #cartTable td {
-            padding: 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
+
+        .cart-qty-input {
+            width: 72px;
+            padding: 6px 10px;
+            background: #0f0f1a;
+            border: 1px solid #2a2a45;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            text-align: center;
+            transition: border-color 0.2s;
         }
-        
-        #cartTable td {
-            padding: 12px 15px;
+        .cart-qty-input:focus {
+            outline: none;
+            border-color: var(--primary, #3b82f6);
         }
-        
-        #cartTable input[type="number"] {
-            width: 60px;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+
+        .cart-item-subtotal {
+            font-weight: 700;
+            color: #e2e8f0;
+            font-size: 0.95rem;
         }
-        
-        .btn-remove {
-            background: #e74c3c;
-            color: white;
+
+        .cart-btn-remove {
+            background: none;
             border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
+            color: #444;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 1.1rem;
+            padding: 6px;
+            border-radius: 6px;
+            transition: color 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
         }
-        
-        .btn-remove:hover {
-            background: #c0392b;
+        .cart-btn-remove:hover { color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+
+        /* ── Panel resumen ── */
+        .cart-summary-panel {
+            background: #141420;
+            border-radius: 16px;
+            border: 1px solid #1e1e30;
+            padding: 1.5rem;
+            position: sticky;
+            top: 100px;
         }
-        
-        .carrito-resumen {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            text-align: right;
+
+        .cart-summary-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #1e1e30;
         }
-        
-        .resumen-item {
+
+        .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            font-size: 16px;
+            align-items: center;
+            padding: 0.6rem 0;
+            font-size: 0.95rem;
+            color: #888;
         }
-        
-        .resumen-total {
-            font-size: 24px;
-            font-weight: bold;
-            color: #27ae60;
-            border-top: 2px solid #ddd;
-            padding-top: 15px;
-            margin-top: 15px;
-        }
-        
-        .botones-carrito {
+        .summary-row span:last-child { color: #e2e8f0; font-weight: 600; }
+
+        .summary-total {
             display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 20px;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0 0;
+            margin-top: 0.75rem;
+            border-top: 1px solid #1e1e30;
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #fff;
         }
-        
-        .btn-comprar {
-            background: #27ae60;
+        .summary-total span:last-child { color: #4a9eff; font-size: 1.4rem; }
+
+        .cart-summary-actions {
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary, #3b82f6), #2563eb);
             color: white;
             border: none;
-            padding: 12px 30px;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: transform 0.2s, opacity 0.2s;
         }
-        
-        .btn-comprar:hover {
-            background: #229954;
-        }
-        
-        .btn-continuar {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 4px;
-            font-size: 16px;
+        .btn-checkout:hover { transform: translateY(-2px); opacity: 0.92; }
+
+        .btn-continue {
+            width: 100%;
+            padding: 0.8rem;
+            background: transparent;
+            color: #888;
+            border: 1px solid #2a2a45;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
+            text-align: center;
             text-decoration: none;
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: color 0.2s, border-color 0.2s;
         }
-        
-        .btn-continuar:hover {
-            background: #2980b9;
+        .btn-continue:hover { color: #e2e8f0; border-color: #4a5568; }
+
+        /* ── Formulario de pedido ── */
+        .order-form-panel {
+            grid-column: 1 / -1;
+            background: #141420;
+            border-radius: 16px;
+            border: 1px solid #1e1e30;
+            padding: 2rem;
+            margin-top: 1rem;
+            display: none;
         }
-        
-        .form-pedido {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 30px;
+        .order-form-panel.visible { display: block; }
+
+        .order-form-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-        
-        .form-pedido h3 {
-            margin-top: 0;
+        .order-form-title i { color: var(--primary, #3b82f6); }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
         }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
+        @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .form-group.full-width { grid-column: 1 / -1; }
+
         .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
-        
+
         .form-group input,
         .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-family: Arial, sans-serif;
+            background: #0f0f1a;
+            border: 1px solid #2a2a45;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: #e2e8f0;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
         }
-        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary, #3b82f6);
+        }
         .form-group textarea {
             resize: vertical;
             min-height: 100px;
         }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1e1e30;
+        }
+
+        .btn-submit {
+            padding: 0.9rem 2.5rem;
+            background: linear-gradient(135deg, #2ed573, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: transform 0.2s;
+        }
+        .btn-submit:hover { transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .btn-cancel {
+            padding: 0.9rem 1.5rem;
+            background: transparent;
+            color: #888;
+            border: 1px solid #2a2a45;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .btn-cancel:hover { color: #e2e8f0; border-color: #4a5568; }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <h1>MB Solutions CR</h1>
-        <nav>
-            <a href="index.html">Tienda</a>
-            <a href="cart.html" class="active">Carrito (<span class="cart-count" style="display:none;">0</span>)</a>
-            <button id="btnLogout" style="display:none;">Logout</button>
-        </nav>
-    </header>
-
-    <!-- Contenido Carrito -->
-    <div class="carrito-container">
-        <h2>Mi Carrito</h2>
-        
-        <div id="carritoVacio" class="carrito-vacio" style="display:none;">
-            <p>Tu carrito está vacío</p>
-            <a href="index.html" class="btn-continuar">Continuar comprando</a>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <img src="images/mbslogo.webp" alt="MB Solutions Logo" class="logo-img">
+                <div class="logo-text">MB Solutions</div>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#inicio">Inicio</a></li>
+                <li><a href="index.html#servicios">Servicios</a></li>
+                <li><a href="index.html#tienda">Tienda</a></li>
+                <li><a href="index.html#nosotros">Nosotros</a></li>
+                <li><a href="index.html#contacto" class="nav-cta">Contacto</a></li>
+                <li>
+                    <a href="cart.html" style="position:relative;">
+                        🛒 Carrito
+                        <span class="cart-count" style="display:none; position:absolute; top:-5px; right:-10px; background:#e74c3c; color:white; border-radius:50%; width:20px; height:20px; align-items:center; justify-content:center; font-size:12px;">0</span>
+                    </a>
+                </li>
+            </ul>
         </div>
-        
-        <div id="carritoLleno" style="display:none;">
-            <table id="cartTable">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Precio</th>
-                        <th>Cantidad</th>
-                        <th>Subtotal</th>
-                        <th>Acción</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-            
-            <div class="carrito-resumen">
-                <div class="resumen-item">
-                    <span>Subtotal:</span>
-                    <span id="cartSubtotal">₡0.00</span>
-                </div>
-                <div class="resumen-item">
-                    <span>Impuesto:</span>
-                    <span id="cartTax">₡0.00</span>
-                </div>
-                <div class="resumen-total">
-                    <span>Total: </span>
-                    <span id="cartTotal">₡0.00</span>
-                </div>
+    </nav>
+
+    <main class="cart-page">
+        <div class="cart-container">
+
+            <h1 class="cart-page-title">
+                <i class="fas fa-shopping-cart"></i> Mi Carrito
+            </h1>
+
+            <div class="cart-layout" id="cartLayout">
+                <!-- Se llena dinámicamente -->
             </div>
-            
-            <div class="botones-carrito">
-                <a href="index.html" class="btn-continuar">Continuar comprando</a>
-                <button class="btn-comprar" onclick="mostrarFormularioPedido()">Proceder al Pago</button>
-            </div>
-            
-            <!-- Formulario de Pedido -->
-            <div class="form-pedido" id="formularioPedido" style="display:none;">
-                <h3>Información de Pedido</h3>
+
+            <!-- Formulario de pedido (fuera del grid de dos columnas) -->
+            <div class="order-form-panel" id="formularioPedido">
+                <h2 class="order-form-title">
+                    <i class="fas fa-clipboard-list"></i> Información del Pedido
+                </h2>
                 <form onsubmit="enviarPedido(event)">
-                    <div class="form-group">
-                        <label>Nombre *</label>
-                        <input type="text" id="nombreCliente" required>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nombre completo *</label>
+                            <input type="text" id="nombreCliente" placeholder="Juan Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Correo electrónico *</label>
+                            <input type="email" id="emailCliente" placeholder="correo@ejemplo.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="telefonoCliente" placeholder="8888-8888">
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección *</label>
+                            <input type="text" id="direccionCliente" placeholder="Provincia, Cantón, Distrito" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>Notas especiales</label>
+                            <textarea id="notasCliente" placeholder="Preferencias de pago, horario de entrega, etc."></textarea>
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label>Email *</label>
-                        <input type="email" id="emailCliente" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Teléfono</label>
-                        <input type="tel" id="telefonoCliente">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Dirección *</label>
-                        <input type="text" id="direccionCliente" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Notas Especiales</label>
-                        <textarea id="notasCliente" placeholder="Ej: Preferencias de pago, horario de entrega, etc."></textarea>
-                    </div>
-                    
-                    <div class="botones-carrito">
-                        <button type="button" class="btn-continuar" onclick="ocultarFormularioPedido()">Cancelar</button>
-                        <button type="submit" class="btn-comprar">Enviar Pedido</button>
+                    <div class="form-actions">
+                        <button type="button" class="btn-cancel" onclick="ocultarFormularioPedido()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn-submit" id="btnSubmitPedido">
+                            <i class="fas fa-paper-plane"></i> Enviar Pedido
+                        </button>
                     </div>
                 </form>
             </div>
+
         </div>
-    </div>
+    </main>
 
     <script src="api-config.js"></script>
     <script src="cart.js"></script>
     <script src="session.js"></script>
-    
+
     <script>
-        // Mostrar/Ocultar carrito
-        function mostrarCarrito() {
+        function getProductImageUrl(imagePath) {
+            if (!imagePath || imagePath === 'images/placeholder.jpg') return 'images/placeholder.jpg';
+            const filename = imagePath.replace(/^images\//, '');
+            return `${API_BASE}/api/images/${filename}`;
+        }
+
+        function renderCartPage() {
             const cart = getCart();
-            const carritoVacio = document.getElementById('carritoVacio');
-            const carritoLleno = document.getElementById('carritoLleno');
-            
+            const layout = document.getElementById('cartLayout');
+
             if (cart.length === 0) {
-                carritoVacio.style.display = 'block';
-                carritoLleno.style.display = 'none';
-            } else {
-                carritoVacio.style.display = 'none';
-                carritoLleno.style.display = 'block';
-                displayCart();
-                actualizarResumen();
-            }
-        }
-        
-        // Mostrar formulario de pedido
-        function mostrarFormularioPedido() {
-            document.getElementById('formularioPedido').style.display = 'block';
-            document.querySelector('.form-pedido').scrollIntoView({ behavior: 'smooth' });
-        }
-        
-        // Ocultar formulario de pedido
-        function ocultarFormularioPedido() {
-            document.getElementById('formularioPedido').style.display = 'none';
-        }
-        
-        // Enviar pedido
-        async function enviarPedido(event) {
-            event.preventDefault();
-            
-            const cart = getCart();
-            if (cart.length === 0) {
-                alert('El carrito está vacío');
+                layout.innerHTML = `
+                    <div class="cart-empty">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h3>Tu carrito está vacío</h3>
+                        <p>Agrega productos desde la tienda para continuar.</p>
+                        <a href="index.html#tienda" class="btn btn-primary" style="display:inline-flex; gap:0.5rem; align-items:center;">
+                            <i class="fas fa-store"></i> Ver Tienda
+                        </a>
+                    </div>`;
                 return;
             }
-            
+
+            const itemsHTML = cart.map(item => {
+                const precio = Number(item.price) || 0;
+                const subtotal = precio * item.quantity;
+                const stockMax = item.stock ?? 999;
+
+                return `
+                <div class="cart-item" id="item-${item.id}">
+                    <div class="cart-item-info">
+                        <img src="${getProductImageUrl(item.image)}" class="cart-item-img" alt="${item.name}" loading="lazy">
+                        <div>
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-code">Cód: ${item.code || '-'}</div>
+                        </div>
+                    </div>
+                    <div class="cart-item-price">₡${precio.toLocaleString('es-CR', {minimumFractionDigits:2})}</div>
+                    <div>
+                        <input
+                            type="number"
+                            class="cart-qty-input"
+                            min="1"
+                            max="${stockMax}"
+                            value="${item.quantity}"
+                            onchange="updateQuantity(${item.id}, parseInt(this.value,10)); renderCartPage();">
+                    </div>
+                    <div class="cart-item-subtotal">₡${subtotal.toLocaleString('es-CR', {minimumFractionDigits:2})}</div>
+                    <button class="cart-btn-remove" onclick="removeFromCart(${item.id}); renderCartPage();" title="Eliminar producto">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>`;
+            }).join('');
+
+            // Calcular totales
+            const totalConIVA   = getCartTotal();
+            const subtotalSinIVA = totalConIVA / 1.13;
+            const iva           = totalConIVA - subtotalSinIVA;
+            const fmt = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
+
+            layout.innerHTML = `
+                <!-- Items -->
+                <div class="cart-items-panel">
+                    <div class="cart-items-header">
+                        <span>Producto</span>
+                        <span>Precio</span>
+                        <span>Cantidad</span>
+                        <span>Subtotal</span>
+                        <span></span>
+                    </div>
+                    ${itemsHTML}
+                </div>
+
+                <!-- Resumen -->
+                <div class="cart-summary-panel">
+                    <div class="cart-summary-title"><i class="fas fa-receipt"></i> Resumen</div>
+                    <div class="summary-row">
+                        <span>Subtotal (sin IVA)</span>
+                        <span>₡${subtotalSinIVA.toLocaleString('es-CR', fmt)}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>IVA (13%)</span>
+                        <span>₡${iva.toLocaleString('es-CR', fmt)}</span>
+                    </div>
+                    <div class="summary-total">
+                        <span>Total</span>
+                        <span>₡${totalConIVA.toLocaleString('es-CR', fmt)}</span>
+                    </div>
+                    <div class="cart-summary-actions">
+                        <button class="btn-checkout" onclick="mostrarFormularioPedido()">
+                            <i class="fas fa-credit-card"></i> Proceder al Pago
+                        </button>
+                        <a href="index.html#tienda" class="btn-continue">
+                            <i class="fas fa-arrow-left"></i> Seguir comprando
+                        </a>
+                    </div>
+                </div>`;
+        }
+
+        function mostrarFormularioPedido() {
+            const form = document.getElementById('formularioPedido');
+            form.classList.add('visible');
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function ocultarFormularioPedido() {
+            document.getElementById('formularioPedido').classList.remove('visible');
+        }
+
+        async function enviarPedido(event) {
+            event.preventDefault();
+
+            const cart = getCart();
+            if (cart.length === 0) {
+                showToast('El carrito está vacío.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnSubmitPedido');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+
             const pedido = {
                 cliente: {
-                    nombre: document.getElementById('nombreCliente').value,
-                    email: document.getElementById('emailCliente').value,
-                    telefono: document.getElementById('telefonoCliente').value,
+                    nombre:    document.getElementById('nombreCliente').value,
+                    email:     document.getElementById('emailCliente').value,
+                    telefono:  document.getElementById('telefonoCliente').value,
                     direccion: document.getElementById('direccionCliente').value,
-                    notas: document.getElementById('notasCliente').value
+                    notas:     document.getElementById('notasCliente').value,
                 },
                 productos: cart,
                 total: getCartTotal(),
                 fecha: new Date().toISOString()
             };
-            
+
             try {
-                const response = await fetch(`₡{API_BASE}/api/enviar-pedido`, {
+                const response = await fetch(`${API_BASE}/api/enviar-pedido`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(pedido)
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (response.ok) {
-                    alert('¡Pedido enviado exitosamente! Pronto nos pondremos en contacto.');
+                    showToast('¡Pedido enviado exitosamente! Pronto nos pondremos en contacto.', 'success');
                     clearCart();
-                    mostrarCarrito();
                     ocultarFormularioPedido();
+                    renderCartPage();
                 } else {
-                    alert('Error: ' + (data.error || 'Error al enviar pedido'));
+                    showToast('Error: ' + (data.error || 'No se pudo enviar el pedido.'), 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Pedido';
                 }
             } catch (error) {
                 console.error('Error al enviar pedido:', error);
-                alert('Error de conexión: ' + error.message);
+                showToast('Error de conexión. Verifica tu internet e intenta de nuevo.', 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Pedido';
             }
         }
-        
-        // Logout
-        const btnLogout = document.getElementById('btnLogout');
-        if (btnLogout) {
-            btnLogout.addEventListener('click', logout);
+
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
         }
-        
-        // Mostrar botón logout si hay sesión
-        if (localStorage.getItem('authToken')) {
-            btnLogout.style.display = 'inline';
-        }
-        
-        // Inicializar página
-        window.addEventListener('load', mostrarCarrito);
+
+        // Inicializar
+        window.addEventListener('load', renderCartPage);
     </script>
 </body>
 </html>

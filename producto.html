@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Los meta tags SEO se llenan dinámicamente con JavaScript -->
+    <title>Cargando producto... | MB Solutions CR</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="computadoras zona sur, soporte técnico Pérez Zeledón, MB Solutions CR, laptops Costa Rica, reparación de computadoras Golfito, cámaras de seguridad zona sur, tecnología Puerto Jiménez">
+    <meta property="og:title" content="">
+    <meta property="og:description" content="">
+    <meta property="og:image" content="">
+    <meta property="og:type" content="product">
+    <meta property="og:url" content="">
+    <!-- Canonical URL dinámica -->
+    <link rel="canonical" href="">
+    <!-- Schema.org structured data (se llena dinámicamente) -->
+    <script type="application/ld+json" id="schemaProducto"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="api-config.js"></script>
+
+    <style>
+        /* ===== PÁGINA DE PRODUCTO ===== */
+        .product-page {
+            min-height: 100vh;
+            background: var(--bg-primary, #0a0a0f);
+            padding-top: 80px;
+        }
+
+        .product-page-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+            color: #888;
+        }
+        .breadcrumb a {
+            color: #4a9eff;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb span { color: #555; }
+
+        /* Layout principal */
+        .product-page-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        @media (max-width: 768px) {
+            .product-page-body { grid-template-columns: 1fr; gap: 2rem; }
+        }
+
+        /* Imagen */
+        .product-page-image-wrap {
+            background: #141420;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #1e1e30;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .product-page-image-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 1.5rem;
+        }
+
+        /* Info */
+        .product-page-info { display: flex; flex-direction: column; gap: 1.2rem; }
+
+        .product-page-category {
+            display: inline-block;
+            background: rgba(74, 158, 255, 0.15);
+            color: #4a9eff;
+            border: 1px solid rgba(74, 158, 255, 0.3);
+            padding: 0.3rem 0.9rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+
+        .product-page-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.2;
+            margin: 0;
+        }
+
+        .product-page-code {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .product-page-price-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #141420;
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid #1e1e30;
+        }
+        .product-page-price {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #4a9eff;
+        }
+        .product-page-stock-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .product-page-stock-badge.in-stock {
+            background: rgba(46, 213, 115, 0.15);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+        .product-page-stock-badge.out-stock {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .product-page-description {
+            color: #aaa;
+            line-height: 1.75;
+            font-size: 1rem;
+        }
+
+        .product-page-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .product-page-actions .btn {
+            flex: 1;
+            min-width: 160px;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            transition: transform 0.2s, opacity 0.2s;
+            text-decoration: none;
+        }
+        .product-page-actions .btn:hover { transform: translateY(-2px); }
+        .btn-cart {
+            background: linear-gradient(135deg, #4a9eff, #0066cc);
+            color: white;
+        }
+        .btn-cart:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+        }
+
+        /* Share row */
+        .product-page-share {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #1e1e30;
+        }
+        .product-page-share span { color: #666; font-size: 0.9rem; }
+        .share-btn {
+            background: #1e1e30;
+            border: 1px solid #2a2a45;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #aaa;
+            cursor: pointer;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s, color 0.2s;
+        }
+        .share-btn:hover { background: #2a2a45; color: #fff; }
+        .share-btn.copied { color: #2ed573; border-color: #2ed573; }
+
+        /* Estado de carga y error */
+        .product-page-loading,
+        .product-page-error {
+            text-align: center;
+            padding: 5rem 2rem;
+            color: #888;
+        }
+        .product-page-error h2 { color: #e74c3c; margin-bottom: 1rem; }
+        .product-page-error a {
+            color: #4a9eff;
+            text-decoration: none;
+        }
+        .product-page-error a:hover { text-decoration: underline; }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #1e1e30;
+            border-top-color: #4a9eff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1.5rem;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-container">
+                <img src="images/mbslogo.webp" alt="MB Solutions Logo" class="logo-img">
+                <div class="logo-text">MB Solutions</div>
+            </div>
+            <div class="nav-toggle" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#inicio">Inicio</a></li>
+                <li><a href="index.html#servicios">Servicios</a></li>
+                <li><a href="index.html#tienda">Tienda</a></li>
+                <li><a href="index.html#nosotros">Nosotros</a></li>
+                <li><a href="index.html#contacto" class="nav-cta">Contacto</a></li>
+                <li>
+                    <a href="cart.html" style="position:relative;">
+                        🛒 Carrito
+                        <span class="cart-count" style="display:none; position:absolute; top:-5px; right:-10px; background:#e74c3c; color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:12px;">0</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="product-page">
+        <div class="product-page-container">
+
+            <!-- Estado: Cargando -->
+            <div id="estadoCargando" class="product-page-loading">
+                <div class="spinner"></div>
+                <p>Cargando producto...</p>
+            </div>
+
+            <!-- Estado: Error -->
+            <div id="estadoError" class="product-page-error" style="display:none;">
+                <h2><i class="fas fa-exclamation-triangle"></i> Producto no encontrado</h2>
+                <p>Este producto no existe o fue eliminado.</p>
+                <br>
+                <a href="index.html#tienda"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
+            </div>
+
+            <!-- Contenido del producto -->
+            <div id="contenidoProducto" style="display:none;">
+
+                <!-- Breadcrumb -->
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="index.html">Inicio</a>
+                    <span>/</span>
+                    <a href="index.html#tienda">Tienda</a>
+                    <span>/</span>
+                    <a href="#" id="breadcrumbCategoria"></a>
+                    <span>/</span>
+                    <span id="breadcrumbNombre"></span>
+                </nav>
+
+                <div class="product-page-body">
+                    <!-- Imagen -->
+                    <div class="product-page-image-wrap">
+                        <img id="productoImagen" src="" alt="">
+                    </div>
+
+                    <!-- Info -->
+                    <div class="product-page-info">
+                        <span class="product-page-category" id="productoCategoriaLabel"></span>
+                        <h1 class="product-page-name" id="productoNombre"></h1>
+                        <p class="product-page-code" id="productoCodigo"></p>
+
+                        <div class="product-page-price-row">
+                            <span class="product-page-price" id="productoPrecio"></span>
+                            <span class="product-page-stock-badge" id="productoStock"></span>
+                        </div>
+
+                        <p class="product-page-description" id="productoDescripcion"></p>
+
+                        <div class="product-page-actions">
+                            <button class="btn btn-cart" id="btnAgregarCarrito" onclick="agregarAlCarritoDesdeProductPage()">
+                                <i class="fas fa-cart-plus"></i> Agregar al carrito
+                            </button>
+                            <button class="btn btn-whatsapp" id="btnWhatsApp" onclick="contactarWhatsApp()">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </button>
+                        </div>
+
+                        <!-- Compartir -->
+                        <div class="product-page-share">
+                            <span>Compartir:</span>
+                            <button class="share-btn" onclick="copiarEnlace(this)">
+                                <i class="fas fa-link"></i> Copiar enlace
+                            </button>
+                            <a class="share-btn" id="shareWhatsApp" href="#" target="_blank">
+                                <i class="fab fa-whatsapp"></i> WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="cart.js"></script>
+    <script>
+        // ==========================================
+        // LÓGICA DE PÁGINA DE PRODUCTO INDIVIDUAL
+        // ==========================================
+
+        const categoriaLabels = {
+            'laptops': 'Laptops',
+            'desktops': 'Computadoras',
+            'accesorios': 'Accesorios',
+            'componentes': 'Componentes',
+            'consumibles': 'Consumibles'
+        };
+
+        function getProductImageUrl(imagePath) {
+            if (!imagePath || imagePath === 'images/placeholder.jpg') return 'images/placeholder.jpg';
+            const filename = imagePath.replace(/^images\//, '');
+            return `${API_BASE}/api/images/${filename}`;
+        }
+
+        // Obtener ID del producto desde la URL: /producto/123
+        function getProductIdFromUrl() {
+            const path = window.location.pathname;
+            // Soporta /producto/123 y /producto/123-nombre-slug
+            const match = path.match(/\/producto\/(\d+)/);
+            return match ? parseInt(match[1]) : null;
+        }
+
+        async function cargarProducto() {
+            const productId = getProductIdFromUrl();
+
+            if (!productId) {
+                mostrarError();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/productos/${productId}`);
+                if (!response.ok) {
+                    mostrarError();
+                    return;
+                }
+
+                const producto = await response.json();
+                renderizarProducto(producto);
+
+            } catch (error) {
+                console.error('Error al cargar producto:', error);
+                mostrarError();
+            }
+        }
+
+        function renderizarProducto(p) {
+            const categoriaLabel = categoriaLabels[p.category] || p.category;
+            const precioFormateado = `₡${parseInt(p.price).toLocaleString()}`;
+            const imageUrl = getProductImageUrl(p.image);
+            const currentUrl = window.location.href;
+            const inStock = p.stock > 0;
+
+            // ── SEO: Actualizar meta tags dinámicamente ──
+            document.title = `${p.name} | MB Solutions CR`;
+
+            setMeta('description', `${p.description.substring(0, 155)}... | MB Solutions CR - Tecnología en Costa Rica`);
+            setOG('og:title', `${p.name} | MB Solutions CR`);
+            setOG('og:description', p.description.substring(0, 200));
+            setOG('og:image', imageUrl);
+            setOG('og:url', currentUrl);
+            document.querySelector('link[rel="canonical"]').href = currentUrl;
+
+            // ── Schema.org para Google ──
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": p.name,
+                "description": p.description,
+                "sku": p.code,
+                "image": imageUrl,
+                "brand": { "@type": "Brand", "name": "MB Solutions CR" },
+                "offers": {
+                    "@type": "Offer",
+                    "priceCurrency": "CRC",
+                    "price": p.price,
+                    "availability": inStock
+                        ? "https://schema.org/InStock"
+                        : "https://schema.org/OutOfStock",
+                    "seller": { "@type": "Organization", "name": "MB Solutions CR" },
+                    "url": currentUrl
+                }
+            };
+            document.getElementById('schemaProducto').textContent = JSON.stringify(schema);
+
+            // ── Llenar contenido visual ──
+            document.getElementById('productoImagen').src = imageUrl;
+            document.getElementById('productoImagen').alt = p.name;
+            document.getElementById('productoNombre').textContent = p.name;
+            document.getElementById('productoCodigo').textContent = `Código: ${p.code}`;
+            document.getElementById('productoCategoriaLabel').textContent = categoriaLabel;
+            document.getElementById('productoPrecio').textContent = precioFormateado;
+
+            const stockEl = document.getElementById('productoStock');
+            stockEl.textContent = inStock ? 'En Stock' : 'Agotado';
+            stockEl.className = `product-page-stock-badge ${inStock ? 'in-stock' : 'out-stock'}`;
+
+            document.getElementById('productoDescripcion').textContent = p.description;
+
+            if (!inStock) {
+                const btn = document.getElementById('btnAgregarCarrito');
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-times-circle"></i> Agotado';
+            }
+
+            // Breadcrumb
+            const breadcrumbCat = document.getElementById('breadcrumbCategoria');
+            breadcrumbCat.textContent = categoriaLabel;
+            breadcrumbCat.href = `index.html#tienda`;
+            document.getElementById('breadcrumbNombre').textContent = p.name;
+
+            // Share links
+            const waText = encodeURIComponent(`¡Mira este producto en MB Solutions CR!\n${p.name}\n${precioFormateado}\n${currentUrl}`);
+            document.getElementById('shareWhatsApp').href = `https://wa.me/?text=${waText}`;
+
+            // Guardar producto en window para las funciones de botones
+            window._producto = p;
+
+            // Mostrar contenido
+            document.getElementById('estadoCargando').style.display = 'none';
+            document.getElementById('contenidoProducto').style.display = 'block';
+        }
+
+        function mostrarError() {
+            document.getElementById('estadoCargando').style.display = 'none';
+            document.getElementById('estadoError').style.display = 'block';
+        }
+
+        function setMeta(name, content) {
+            let el = document.querySelector(`meta[name="${name}"]`);
+            if (el) el.setAttribute('content', content);
+        }
+
+        function setOG(property, content) {
+            let el = document.querySelector(`meta[property="${property}"]`);
+            if (el) el.setAttribute('content', content);
+        }
+
+        function agregarAlCarritoDesdeProductPage() {
+            const p = window._producto;
+            if (!p || p.stock <= 0) return;
+            addToCart({
+                id: p.id,
+                code: p.code,
+                name: p.name,
+                price: p.price,
+                image: p.image,
+                stock: p.stock
+            });
+            const btn = document.getElementById('btnAgregarCarrito');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡Agregado!';
+            btn.style.background = '#2ed573';
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.background = '';
+            }, 2000);
+        }
+
+        function contactarWhatsApp() {
+            const p = window._producto;
+            if (!p) return;
+            const msg = `Hola, estoy interesado en:\n\n${p.name}\nCódigo: ${p.code}\nPrecio: ₡${parseInt(p.price).toLocaleString()}\n${window.location.href}`;
+            window.open(`https://wa.me/50662055092?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        function copiarEnlace(btn) {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i> ¡Copiado!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-link"></i> Copiar enlace';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        function toggleMenu() {
+            document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        // Iniciar
+        cargarProducto();
+    </script>
+</body>
+</html>

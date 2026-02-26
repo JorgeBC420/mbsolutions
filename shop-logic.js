@@ -69,20 +69,44 @@ function loadCategoryFilters() {
     filterDiv.innerHTML = html;
 }
 
+
+// ── Genera slug de URL a partir de un nombre de producto ──
+// Ejemplo: "Adaptador SATA a USB" → "adaptador-sata-a-usb"
+function generarSlug(nombre) {
+    return nombre
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+}
+
 function renderProducts(category = 'all') {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
 
     const filtered = category === 'all' ? products : products.filter(p => p.category === category);
-    
+
     if (filtered.length === 0) {
         grid.innerHTML = '<p style="grid-column:1/-1; text-align:center; padding:3rem; color: var(--gray);">No hay productos en esta categoría.</p>';
         return;
     }
 
-    grid.innerHTML = filtered.map(p => `
-        <div class="product-card" onclick="openProductModal(${p.id})">
-            <img src="${getProductImageUrl(p.image)}" class="product-image" alt="${p.name}">
+    grid.innerHTML = filtered.map(p => {
+        const slug = generarSlug(p.name);
+        const productoUrl = `/producto/${p.id}/${slug}`;
+
+        return `
+        <div class="product-card" style="position:relative;" onclick="openProductModal(${p.id})">
+            <!--
+                Enlace SEO real: Google puede seguirlo aunque el onclick lo intercepte.
+                Permite compartir el link con clic derecho > "Copiar URL del enlace".
+            -->
+            <a href="${productoUrl}"
+               aria-label="Ver ${p.name}"
+               onclick="event.preventDefault(); openProductModal(${p.id})"
+               style="position:absolute; inset:0; z-index:1; border-radius:inherit; display:block;">
+            </a>
+            <img src="${getProductImageUrl(p.image)}" class="product-image" alt="${p.name}" loading="lazy">
             <div class="product-info">
                 <span class="product-category">${p.category}</span>
                 <h3 class="product-name">${p.name}</h3>
@@ -93,58 +117,86 @@ function renderProducts(category = 'all') {
                     </span>
                 </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
-
-function filterCategory(category) {
-    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.classList.add('active');
-    renderProducts(category);
-}
-
-// ========================================
-// FUNCIONES DEL MODAL DE PRODUCTO
-// ========================================
 
 function openProductModal(productId) {
     selectedProduct = products.find(p => p.id === productId);
     if (!selectedProduct) return;
-    
+
     document.getElementById('modalProductImage').src = getProductImageUrl(selectedProduct.image);
     document.getElementById('modalProductName').textContent = selectedProduct.name;
     document.getElementById('modalProductCode').textContent = selectedProduct.code;
     document.getElementById('modalProductPrice').textContent = `₡${parseInt(selectedProduct.price).toLocaleString()}`;
-    
+
     const stockEl = document.getElementById('modalProductStock');
     stockEl.textContent = selectedProduct.stock > 0 ? 'En Stock' : 'Agotado';
     stockEl.className = `product-stock ${selectedProduct.stock > 0 ? 'in-stock' : 'out-stock'}`;
-    
+
     document.getElementById('modalProductDescription').textContent = selectedProduct.description;
+
+    // ── Botón "Copiar enlace" en el modal ──
+    // Selector corregido: el HTML real usa .product-actions
+    const modalActions = document.querySelector('.product-actions');
+    if (modalActions) {
+        // Eliminar botón anterior si existía (de un producto visto antes)
+        const existente = modalActions.querySelector('.btn-share-product');
+        if (existente) existente.remove();
+
+        const slug = generarSlug(selectedProduct.name);
+        const productoUrl = `${window.location.origin}/producto/${selectedProduct.id}/${slug}`;
+
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'btn-share-product';
+        shareBtn.type = 'button';
+        shareBtn.style.cssText = `
+            width: 100%;
+            margin-top: 8px;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 0.88rem;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s, color 0.2s;
+        `;
+        shareBtn.innerHTML = '<i class="fas fa-link"></i> Copiar enlace del producto';
+
+        shareBtn.onmouseenter = () => { shareBtn.style.background = '#2a3a50'; shareBtn.style.color = '#e2e8f0'; };
+        shareBtn.onmouseleave = () => { shareBtn.style.background = '#1e293b'; shareBtn.style.color = '#94a3b8'; };
+
+        shareBtn.onclick = () => {
+            navigator.clipboard.writeText(productoUrl).then(() => {
+                shareBtn.innerHTML = '<i class="fas fa-check"></i> ¡Enlace copiado!';
+                shareBtn.style.color = '#2ed573';
+                shareBtn.style.borderColor = '#2ed573';
+                setTimeout(() => {
+                    shareBtn.innerHTML = '<i class="fas fa-link"></i> Copiar enlace del producto';
+                    shareBtn.style.color = '#94a3b8';
+                    shareBtn.style.borderColor = '#334155';
+                }, 2500);
+            });
+        };
+
+        modalActions.appendChild(shareBtn);
+    }
+
     document.getElementById('productModal').classList.add('active');
     document.body.style.overflow = 'hidden';
 }
 
-function closeProductModal() {
-    document.getElementById('productModal').classList.remove('active');
-    document.body.style.overflow = 'auto';
-}
-
-function contactProduct() {
-    if (!selectedProduct) return;
-    const message = `Hola, estoy interesado en:\n\n${selectedProduct.name}\nCódigo: ${selectedProduct.code}\nPrecio: ₡${parseInt(selectedProduct.price).toLocaleString()}`;
-    const url = `https://wa.me/50662055092?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
-}
-
+// ── addProductToCart ahora usa addToCart() de cart.js,
+//    que ya incluye la validación de stock máximo ──
 function addProductToCart() {
     if (!selectedProduct) return;
-    if (selectedProduct.stock <= 0) {
-        alert('Producto agotado');
-        return;
-    }
-    
-    // Usar la función del archivo cart.js
+
     addToCart({
         id: selectedProduct.id,
         code: selectedProduct.code,
@@ -153,18 +205,14 @@ function addProductToCart() {
         image: selectedProduct.image,
         stock: selectedProduct.stock
     });
-    
-    closeProductModal();
-}
 
-// Cerrar modal al hacer clic fuera de él
-window.onclick = function(event) {
-    const modal = document.getElementById('productModal');
-    if (event.target === modal) {
+    // Cerrar modal solo si el producto se agregó (no si fue bloqueado por stock)
+    const cart = typeof getCart === 'function' ? getCart() : [];
+    const enCarrito = cart.find(i => i.id === selectedProduct.id);
+    if (enCarrito) {
         closeProductModal();
     }
-};
-
+}
 // ========================================
 // FUNCIONES DE TABS DE CONTACTO
 // ========================================
