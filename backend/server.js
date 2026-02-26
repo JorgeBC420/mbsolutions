@@ -881,7 +881,7 @@ app.get('/sitemap.xml', (req, res) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${baseUrl}/</loc>
-    <changefreq>weekly</changefreq>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>${urls}
 </urlset>`;
@@ -903,6 +903,19 @@ Disallow: /admin
 Disallow: /api/
 
 Sitemap: ${baseUrl}/sitemap.xml`);
+});
+
+// ========================================
+// MANEJO GLOBAL DE ERRORES
+// ========================================
+
+// Debe estar DESPUÉS de todas las rutas y ANTES de app.listen
+app.use((err, req, res, next) => {
+    console.error('[ERROR] Error no capturado:', err.stack);
+    res.status(err.status || 500).json({
+        error: isProduction ? 'Algo salió mal en el servidor' : err.message,
+        success: false
+    });
 });
 
 // ========================================
