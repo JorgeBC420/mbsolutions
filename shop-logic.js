@@ -80,6 +80,16 @@ function generarSlug(nombre) {
         .replace(/^-|-$/g, '');
 }
 
+function filterCategory(category) {
+    // Actualizar botón activo
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = [...document.querySelectorAll('.category-btn')]
+        .find(btn => btn.getAttribute('onclick')?.includes(`'${category}'`));
+    if (activeBtn) activeBtn.classList.add('active');
+
+    renderProducts(category);
+}
+
 function renderProducts(category = 'all') {
     const grid = document.getElementById('productsGrid');
     if (!grid) return;
@@ -217,11 +227,14 @@ function addProductToCart() {
 // FUNCIONES DE TABS DE CONTACTO
 // ========================================
 
-function switchContactTab(type) {
+function switchContactTab(type, event) {
     document.querySelectorAll('.contact-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.contact-form').forEach(f => f.classList.remove('active'));
-    
-    event.currentTarget.classList.add('active');
+
+    // currentTarget viene del parámetro, no del global implícito
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
     document.getElementById(type + 'Form').classList.add('active');
 }
 
