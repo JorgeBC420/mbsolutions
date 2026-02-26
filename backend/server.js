@@ -801,6 +801,32 @@ app.get('/api/health', (req, res) => {
 });
 
 // ========================================
+// VERIFICACIÓN GOOGLE SEARCH CONSOLE
+// ========================================
+
+// Sirve cualquier archivo de verificación de Google (google*.html) desde la carpeta raíz del proyecto
+app.get('/google:code.html', (req, res) => {
+    const filename = `google${req.params.code}.html`;
+    const possiblePaths = [
+        path.join(__dirname__, '..', filename),        // carpeta raíz del proyecto
+        path.join(__dirname__, 'public', filename),     // carpeta public
+        path.join(__dirname__, filename),               // carpeta backend
+    ];
+
+    console.log(`[GOOGLE] Buscando archivo de verificación: ${filename}`);
+
+    for (const filePath of possiblePaths) {
+        if (fs.existsSync(filePath)) {
+            console.log(`[GOOGLE] ✅ Encontrado en: ${filePath}`);
+            return res.sendFile(filePath);
+        }
+    }
+
+    console.warn(`[GOOGLE] ⚠️ Archivo no encontrado: ${filename}`);
+    res.status(404).send(`Archivo ${filename} no encontrado`);
+});
+
+// ========================================
 // RUTAS SEO
 // ========================================
 
