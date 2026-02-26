@@ -144,7 +144,10 @@ body {
    HERO SECTION
    ======================================== */
 .hero {
+    /* 100dvh usa el viewport dinámico real (excluye la barra del navegador en Android/iOS).
+       El fallback 100vh mantiene compatibilidad con navegadores más viejos. */
     min-height: 100vh;
+    min-height: 100dvh;
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
     display: flex;
     align-items: center;
@@ -973,6 +976,16 @@ footer {
 
 .product-actions {
     margin-top: 2rem;
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Botones dentro del modal de producto */
+.btn-action {
+    flex: 1;
+    min-width: 140px;
+    justify-content: center;
 }
 
 /* ========================================
@@ -995,6 +1008,7 @@ footer {
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         transition: right 0.3s ease;
         align-items: flex-start;
+        z-index: 999; /* Justo debajo del navbar, por encima de todo lo demás */
     }
 
     .nav-links.active {
@@ -1020,11 +1034,11 @@ footer {
         font-size: 1.2rem;
     }
 
-    /* Carrusel */
+    /* Carrusel: solo aspect-ratio, sin height fija que lo sobreescriba */
     .carousel-container {
         max-width: 100%;
         aspect-ratio: 16 / 9;
-        height: 300px;
+        height: auto;
     }
 
     /* Secciones */
@@ -1048,7 +1062,12 @@ footer {
     .contact-grid,
     .footer-content {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 2rem; /* Reducido desde 5rem del desktop */
+    }
+
+    /* El iframe de 450px es demasiado alto en móvil */
+    .contact-map iframe {
+        height: 280px !important;
     }
 
     .contact-tabs {
@@ -1126,7 +1145,7 @@ footer {
 
     /* Carrusel */
     .carousel-container {
-        height: 250px;
+        height: auto; /* No sobreescribir con height fija */
     }
 
     .carousel-prev,
@@ -1172,6 +1191,11 @@ footer {
         width: 35px;
         height: 35px;
         font-size: 1.5rem;
+    }
+
+    /* Mapa aún más compacto en móviles pequeños */
+    .contact-map iframe {
+        height: 220px !important;
     }
 
     /* WhatsApp */
